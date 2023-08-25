@@ -1,0 +1,9 @@
+{
+	"devDependencies": {
+		"archiver": "^6.0.0"
+	},
+	"scripts": {
+		"pack": "node exe/pack.js",
+		"release": "node exe/release.js"
+	}
+}

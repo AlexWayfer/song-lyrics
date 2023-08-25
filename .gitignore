@@ -1,2 +1,7 @@
 /extra/
 *.bak
+
+/node_modules/
+pnpm-lock.yaml
+
+/pkg/
