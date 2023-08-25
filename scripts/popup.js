@@ -9,38 +9,50 @@ document.addEventListener('DOMContentLoaded', async event => {
 		currentTabTitle = (await chrome.tabs.query({ active: true, currentWindow: true }))[0].title,
 		songTitleMatch = currentTabTitle.match(/^(?<songTitle>.+) - Deezer$/)
 
-	if (songTitleMatch) {
+	const loadLyrics = async query => {
 		const
-			query = songTitleMatch.groups.songTitle,
-			json = await (await fetch(`https://genius.com/api/search?q=${query}`)).json(),
-			firstHit = json.response.hits[0]
+			searchURL = `https://genius.com/api/search?q=${query}`,
+			searchResponse = await fetch(searchURL)
 
-		if (firstHit && firstHit.type == 'song') {
-			const
-				songData =
-					(await (await fetch(`https://genius.com/api/songs/${firstHit.result.id}`)).json())
-						.response.song,
-				lyricsPage = await (await fetch(songData.description_annotation.url)).text(),
-				parser = new DOMParser(),
-				lyricsDocument = parser.parseFromString(lyricsPage, 'text/html')
+		if (searchResponse.ok) {
+			const firstHit = (await searchResponse.json()).response.hits[0]
 
-			lyricsContainer.querySelector('.title').innerText = songData.full_title
-			lyricsContainer.querySelector('.text').replaceChildren(
-				lyricsDocument.querySelector('[data-lyrics-container="true"]')
-			)
+			if (firstHit && firstHit.type == 'song') {
+				const
+					songData =
+						(await (await fetch(`https://genius.com/api/songs/${firstHit.result.id}`)).json())
+							.response.song,
+					lyricsPage = await (await fetch(songData.description_annotation.url)).text(),
+					parser = new DOMParser(),
+					lyricsDocument = parser.parseFromString(lyricsPage, 'text/html')
 
-			loadingNotice.classList.add('hidden')
-			notFoundNotice.classList.add('hidden')
-			notSupportedNotice.classList.add('hidden')
+				lyricsContainer.querySelector('.title').innerText = songData.full_title
+				lyricsContainer.querySelector('.text').replaceChildren(
+					lyricsDocument.querySelector('[data-lyrics-container="true"]')
+				)
 
-			lyricsContainer.classList.remove('hidden')
+				loadingNotice.classList.add('hidden')
+				notFoundNotice.classList.add('hidden')
+				notSupportedNotice.classList.add('hidden')
+
+				lyricsContainer.classList.remove('hidden')
+			} else {
+				loadingNotice.classList.add('hidden')
+				lyricsContainer.classList.add('hidden')
+				notSupportedNotice.classList.add('hidden')
+
+				notFoundNotice.classList.remove('hidden')
+			}
 		} else {
-			loadingNotice.classList.add('hidden')
-			lyricsContainer.classList.add('hidden')
-			notSupportedNotice.classList.add('hidden')
-
-			notFoundNotice.classList.remove('hidden')
+			const problemWindow = open(searchURL, '_blank', 'popup=true')
+			problemWindow.addEventListener('beforeunload', event => {
+				loadLyrics(query)
+			})
 		}
+	}
+
+	if (songTitleMatch) {
+		loadLyrics(songTitleMatch.groups.songTitle)
 	} else {
 		loadingNotice.classList.add('hidden')
 		lyricsContainer.classList.add('hidden')
