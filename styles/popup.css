@@ -1,0 +1,17 @@
+body {
+	font-size: 18px;
+
+	.hidden {
+		display: none;
+	}
+
+	.lyrics {
+		width: 500px;
+	}
+
+	.not-found,
+	.not-supported {
+		color: red;
+		white-space: nowrap;
+	}
+}
