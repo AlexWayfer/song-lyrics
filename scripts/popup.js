@@ -62,7 +62,8 @@ document.addEventListener('DOMContentLoaded', async event => {
 
 	const
 		currentTab = (await chrome.tabs.query({ active: true, currentWindow: true }))[0],
-		currentTabHostname = (new URL(currentTab.url)).hostname
+		currentTabHostname = (new URL(currentTab.url)).hostname,
+		featuringRegexp = / \(?f(ea)?t\.? .+\)?/
 
 	switch(currentTabHostname) {
 		case 'deezer.com':
@@ -73,10 +74,23 @@ document.addEventListener('DOMContentLoaded', async event => {
 					return document.querySelector('#page_player .track-title').innerText
 				}
 			}, injectionResult => {
-				// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				let songTitle = injectionResult[0].result
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				let
+					songTitle = injectionResult[0].result,
+					[songName, songArtists] = songTitle.split(' · ', 2)
+
 				console.debug('songTitle = ', songTitle)
-				loadLyrics(songTitle)
+				console.debug('songName = ', songName)
+				console.debug('songArtists = ', songArtists)
+
+				songName = songName.replace(featuringRegexp, '')
+				//// Take only the first artist, second can be from the featuring
+				songArtist = songArtists.split(', ', 2)[0]
+
+				const query = `${songName} ${songArtist}`
+				console.debug('query = ', query)
+
+				loadLyrics(query)
 			})
 
 			break
@@ -92,7 +106,7 @@ document.addEventListener('DOMContentLoaded', async event => {
 				let songTitle = injectionResult[0].result
 
 				//// Remove additional notes from song title
-				songTitle = songTitle.replace('(Video)', '').replace(/ \(?f(ea)?t\.? .+\)?/, '')
+				songTitle = songTitle.replace('(Video)', '').replace(featuringRegexp, '')
 
 				console.debug('songTitle = ', songTitle)
 				loadLyrics(songTitle)
