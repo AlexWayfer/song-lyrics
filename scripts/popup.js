@@ -23,9 +23,13 @@ document.addEventListener('DOMContentLoaded', async event => {
 					lyricsDocument = parser.parseFromString(lyricsPage, 'text/html')
 
 				lyricsContainer.querySelector('.title').innerText = songData.full_title
-				lyricsContainer.querySelector('.text').replaceChildren(
-					lyricsDocument.querySelector('[data-lyrics-container="true"]')
-				)
+
+				const
+					lyricsElements =
+						lyricsDocument.querySelector('[data-lyrics-container="true"]') ||
+							lyricsDocument.querySelector('[class^="LyricsPlaceholder__Message"]')
+
+				lyricsContainer.querySelector('.text').replaceChildren(lyricsElements)
 
 				loadingNotice.classList.add('hidden')
 				notFoundNotice.classList.add('hidden')
