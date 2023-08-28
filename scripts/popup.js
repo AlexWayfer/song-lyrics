@@ -83,6 +83,21 @@ document.addEventListener('DOMContentLoaded', async event => {
 			})
 
 			break
+		case 'youtube.com':
+		case 'www.youtube.com':
+			chrome.scripting.executeScript({
+				target: { tabId : currentTab.id },
+				func: () => {
+					return document.querySelector('#below #title').innerText
+				}
+			}, injectionResult => {
+				// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				const songTitle = injectionResult[0].result
+				console.debug('songTitle = ', songTitle)
+				loadLyrics(songTitle)
+			})
+
+			break
 		default:
 			loadingNotice.classList.add('hidden')
 			lyricsContainer.classList.add('hidden')
