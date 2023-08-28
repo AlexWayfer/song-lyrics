@@ -5,10 +5,6 @@ document.addEventListener('DOMContentLoaded', async event => {
 		notFoundNotice = document.querySelector('.not-found'),
 		notSupportedNotice = document.querySelector('.not-supported')
 
-	const
-		currentTabTitle = (await chrome.tabs.query({ active: true, currentWindow: true }))[0].title,
-		songTitleMatch = currentTabTitle.match(/^(?<songTitle>.+) - Deezer$/)
-
 	const loadLyrics = async query => {
 		const
 			searchURL = `https://genius.com/api/search?q=${query}`,
@@ -51,13 +47,31 @@ document.addEventListener('DOMContentLoaded', async event => {
 		}
 	}
 
-	if (songTitleMatch) {
-		loadLyrics(songTitleMatch.groups.songTitle)
-	} else {
-		loadingNotice.classList.add('hidden')
-		lyricsContainer.classList.add('hidden')
-		notFoundNotice.classList.add('hidden')
+	const
+		currentTab = (await chrome.tabs.query({ active: true, currentWindow: true }))[0],
+		currentTabHostname = (new URL(currentTab.url)).hostname
 
-		notSupportedNotice.classList.remove('hidden')
+	switch(currentTabHostname) {
+		case 'deezer.com':
+		case 'www.deezer.com':
+			chrome.scripting.executeScript({
+				target: { tabId : currentTab.id },
+				func: () => {
+					return document.querySelector('#page_player .track-title').innerText
+				}
+			}, injectionResult => {
+				// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				const songTitle = injectionResult[0].result
+				// console.debug('songTitle = ', songTitle)
+				loadLyrics(songTitle)
+			})
+
+			break
+		default:
+			loadingNotice.classList.add('hidden')
+			lyricsContainer.classList.add('hidden')
+			notFoundNotice.classList.add('hidden')
+
+			notSupportedNotice.classList.remove('hidden')
 	}
 })

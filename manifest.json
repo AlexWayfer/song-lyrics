@@ -16,7 +16,8 @@
 		"512": "images/icons/512.png"
 	},
 	"permissions": [
-		"activeTab"
+		"activeTab",
+		"scripting"
 	],
 	"host_permissions": [
 		"https://genius.com/*"
