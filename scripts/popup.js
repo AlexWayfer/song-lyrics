@@ -6,6 +6,9 @@ document.addEventListener('DOMContentLoaded', async event => {
 		notSupportedNotice = document.querySelector('.not-supported')
 
 	const loadLyrics = async query => {
+		//// Remove additional notes from song title
+		query = query.replace('(Video)', '').replace(/ f(ea)?t\.? .+/, '')
+
 		const
 			searchURL = `https://genius.com/api/search?q=${query}`,
 			searchResponse = await fetch(searchURL)
