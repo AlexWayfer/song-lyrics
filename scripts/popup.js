@@ -32,6 +32,15 @@ document.addEventListener('DOMContentLoaded', async event => {
 						lyricsDocument.querySelector('[data-lyrics-container="true"]') ||
 							lyricsDocument.querySelector('[class^="LyricsPlaceholder__Message"]')
 
+				//// Remove links, they're not working.
+				//// I've tried `.innerText`, it returns value with `\n` in console of a regular page,
+				//// but it returns without `\n` from `DOMParser`.
+				lyricsElements.childNodes.forEach(childNode => {
+					if (childNode.tagName == 'A') {
+						childNode.replaceWith(...childNode.childNodes)
+					}
+				})
+
 				lyricsContainer.querySelector('.text').replaceChildren(lyricsElements)
 
 				loadingNotice.classList.add('hidden')
