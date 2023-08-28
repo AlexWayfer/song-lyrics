@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', async event => {
 				let songTitle = injectionResult[0].result
 
 				//// Remove additional notes from song title
-				songTitle = songTitle.replace('(Video)', '').replace(/ f(ea)?t\.? .+/, '')
+				songTitle = songTitle.replace('(Video)', '').replace(/ \(?f(ea)?t\.? .+\)?/, '')
 
 				console.debug('songTitle = ', songTitle)
 				loadLyrics(songTitle)
