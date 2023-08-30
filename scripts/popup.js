@@ -65,9 +65,12 @@ document.addEventListener('DOMContentLoaded', async event => {
 		queryInput.value = query
 
 		const
-			cache = await chrome.storage.local.get('cache'),
+			cache = (await chrome.storage.local.get({ cache: {} })).cache,
 			cached = cache[query],
 			cacheTTL = 24 * 60 * 60 * 1000 //// 24 hours
+
+		console.debug('cache = ', cache)
+		console.debug('cached = ', cached)
 
 		//// https://bugs.chromium.org/p/chromium/issues/detail?id=1472588
 		if (cached && new Date(new Date(cached.createdAt).getTime() + cacheTTL) > new Date()) {
