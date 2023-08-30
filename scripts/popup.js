@@ -142,6 +142,29 @@ document.addEventListener('DOMContentLoaded', async event => {
 			})
 
 			break
+		case 'genius.com':
+		case 'www.genius.com':
+			chrome.scripting.executeScript({
+				target: { tabId : currentTab.id },
+				func: () => {
+					return {
+						songTitle:
+							document.querySelector('[class^="SongHeaderdesktop__Title"]').innerText,
+						songArtist:
+							document.querySelector('[class*="HeaderArtistAndTracklistdesktop__Artist"]').innerText
+					}
+				}
+			}, injectionResult => {
+				// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				let { songTitle, songArtist } = injectionResult[0].result
+
+				console.debug('songTitle = ', songTitle)
+				console.debug('songArtist = ', songArtist)
+
+				loadLyrics(`${songTitle} ${songArtist}`)
+			})
+
+			break
 		default:
 			loadingNotice.classList.add('hidden')
 			lyricsContainer.classList.add('hidden')
