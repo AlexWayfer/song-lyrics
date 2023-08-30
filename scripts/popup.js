@@ -20,12 +20,13 @@ document.addEventListener('DOMContentLoaded', async event => {
 		loadLyrics(queryInput.value)
 	})
 
-	const displayLyrics = (songTitle, lyricsHTML) => {
+	const displayLyrics = (songTitle, lyricsHTML, songLink) => {
 		const
 			parser = new DOMParser(),
 			lyricsDocument = parser.parseFromString(lyricsHTML, 'text/html')
 
 		lyricsContainer.querySelector('.title').innerText = songTitle
+		lyricsContainer.querySelector('.link').href = songLink
 
 		const
 			lyricsElement =
@@ -63,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async event => {
 
 		//// https://bugs.chromium.org/p/chromium/issues/detail?id=1472588
 		if (cached && new Date(new Date(cached.createdAt).getTime() + cacheTTL) > new Date()) {
-			return displayLyrics(cached.songTitle, cached.lyricsHTML)
+			return displayLyrics(cached.songTitle, cached.lyricsHTML, cached.songLink)
 		}
 
 		const
@@ -79,14 +80,17 @@ document.addEventListener('DOMContentLoaded', async event => {
 						(await (await fetch(`https://genius.com/api/songs/${firstHit.result.id}`)).json())
 							.response.song,
 					songTitle = songData.full_title,
+					songLink = songData.url,
 					lyricsPage = await (await fetch(songData.description_annotation.url)).text()
 
 				//// Write to cache
 				//// https://bugs.chromium.org/p/chromium/issues/detail?id=1472588
-				cache[query] = { songTitle, lyricsHTML: lyricsPage, createdAt: (new Date()).toString() }
+				cache[query] = {
+						songTitle, lyricsHTML: lyricsPage, songLink, createdAt: (new Date()).toString()
+				}
 				chrome.storage.local.set({ cache })
 
-				displayLyrics(songTitle, lyricsPage)
+				displayLyrics(songTitle, lyricsPage, songLink)
 			} else {
 				loadingNotice.classList.add('hidden')
 				lyricsContainer.classList.add('hidden')

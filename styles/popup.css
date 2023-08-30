@@ -7,6 +7,18 @@ body {
 
 	.lyrics {
 		width: 500px;
+
+		.title {
+			margin-bottom: 0.2em;
+		}
+
+		.link {
+			font-size: 0.9em;
+		}
+
+		.text {
+			margin-top: 1em;
+		}
 	}
 
 	& form.load {
