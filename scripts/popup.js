@@ -20,6 +20,13 @@ document.addEventListener('DOMContentLoaded', async event => {
 		loadLyrics(queryInput.value)
 	})
 
+	const setColors = (colors) => {
+		document.documentElement.style.setProperty('--background-color', colors.background);
+		document.documentElement.style.setProperty('--text-color', colors.text);
+		document.documentElement.style.setProperty('--link-color', colors.link);
+		document.documentElement.style.setProperty('--border-color', colors.border);
+	}
+
 	const displayLyrics = (songTitle, lyricsHTML, songLink) => {
 		const
 			parser = new DOMParser(),
@@ -123,12 +130,22 @@ document.addEventListener('DOMContentLoaded', async event => {
 			chrome.scripting.executeScript({
 				target: { tabId : currentTab.id },
 				func: () => {
-					return document.querySelector('#page_player .track-title').innerText
+					const documentStyle = getComputedStyle(document.documentElement)
+
+					return {
+						songTitle: document.querySelector('#page_player .track-title').innerText,
+						colors: {
+							background: documentStyle.getPropertyValue('--tempo-colors-bg-main'),
+							text: documentStyle.getPropertyValue('--tempo-colors-text-main'),
+							link: documentStyle.getPropertyValue('--tempo-colors-text-secondary'),
+							border: documentStyle.getPropertyValue('--tempo-colors-divider-main')
+						}
+					}
 				}
 			}, injectionResult => {
 				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
 				let
-					songTitle = injectionResult[0].result,
+					{ songTitle, colors } = injectionResult[0].result,
 					[songName, songArtists] = songTitle.split(' · ', 2)
 
 				console.debug('songTitle = ', songTitle)
@@ -142,6 +159,8 @@ document.addEventListener('DOMContentLoaded', async event => {
 				const query = `${songName} ${songArtist}`
 				console.debug('query = ', query)
 
+				setColors(colors)
+
 				loadLyrics(query)
 			})
 
@@ -151,15 +170,23 @@ document.addEventListener('DOMContentLoaded', async event => {
 			chrome.scripting.executeScript({
 				target: { tabId : currentTab.id },
 				func: () => {
+					const documentStyle = getComputedStyle(document.documentElement)
+
 					return {
 						videoTitle: document.querySelector('#below #title').innerText,
 						channelName: document.querySelector('#below #channel-name').innerText,
-						chapterTitle: document.querySelector('.ytp-chapter-title-content').innerText
+						chapterTitle: document.querySelector('.ytp-chapter-title-content').innerText,
+						colors: {
+							background: documentStyle.getPropertyValue('--yt-spec-base-background'),
+							text: documentStyle.getPropertyValue('--yt-spec-text-primary'),
+							link: documentStyle.getPropertyValue('--yt-spec-call-to-action'),
+							border: documentStyle.getPropertyValue('--yt-spec-10-percent-layer')
+						}
 					}
 				}
 			}, injectionResult => {
 				// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				let { videoTitle, channelName, chapterTitle } = injectionResult[0].result
+				let { videoTitle, channelName, chapterTitle, colors } = injectionResult[0].result
 				let query
 
 				console.debug('videoTitle = ', videoTitle)
@@ -177,6 +204,8 @@ document.addEventListener('DOMContentLoaded', async event => {
 
 				console.debug('query = ', query)
 
+				setColors(colors)
+
 				loadLyrics(query)
 			})
 
@@ -186,19 +215,37 @@ document.addEventListener('DOMContentLoaded', async event => {
 			chrome.scripting.executeScript({
 				target: { tabId : currentTab.id },
 				func: () => {
+					const
+						lyricsStyle =
+							getComputedStyle(document.querySelector('[data-lyrics-container="true"]')),
+						recommendedArtistStyle =
+							getComputedStyle(document.querySelector('[class^="RecommendedSong__ArtistName"]')),
+						recommendedContainerStyle =
+							getComputedStyle(document.querySelector('[class^="RecommendedSongs__Container"]'))
+
 					return {
 						songTitle:
-							document.querySelector('[class^="SongHeaderdesktop__Title"]').innerText,
+							document.querySelector('[class^="SongHeaderdesktop__Title"]')
+								.innerText,
 						songArtist:
-							document.querySelector('[class*="HeaderArtistAndTracklistdesktop__Artist"]').innerText
+							document.querySelector('[class*="HeaderArtistAndTracklistdesktop__Artist"]')
+								.innerText,
+						colors: {
+							background: lyricsStyle.backgroundColor,
+							text: lyricsStyle.color,
+							link: recommendedArtistStyle.color,
+							border: recommendedContainerStyle.borderColor
+						}
 					}
 				}
 			}, injectionResult => {
 				// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				let { songTitle, songArtist } = injectionResult[0].result
+				let { songTitle, songArtist, colors } = injectionResult[0].result
 
 				console.debug('songTitle = ', songTitle)
 				console.debug('songArtist = ', songArtist)
+
+				setColors(colors)
 
 				loadLyrics(`${songTitle} ${songArtist}`)
 			})
