@@ -5,7 +5,49 @@ document.addEventListener('DOMContentLoaded', async event => {
 		notFoundNotice = document.querySelector('.not-found'),
 		notSupportedNotice = document.querySelector('.not-supported')
 
+	const displayLyrics = (songTitle, lyricsHTML) => {
+		const
+			parser = new DOMParser(),
+			lyricsDocument = parser.parseFromString(lyricsHTML, 'text/html')
+
+		lyricsContainer.querySelector('.title').innerText = songTitle
+
+		const
+			lyricsElement =
+				lyricsDocument.querySelector('[data-lyrics-container="true"]') ||
+					lyricsDocument.querySelector('[class^="LyricsPlaceholder__Message"]')
+
+		//// Remove links, they're not working.
+		//// I've tried `.innerText`, it returns value with `\n` in console of a regular page,
+		//// but it returns without `\n` from `DOMParser`.
+		lyricsElement.childNodes.forEach(childNode => {
+			if (childNode.tagName == 'A') {
+				childNode.replaceWith(...childNode.childNodes)
+			}
+		})
+
+		//// Fill with lyrics
+		lyricsContainer.querySelector('.text').replaceChildren(lyricsElement)
+
+		//// Display elements
+		loadingNotice.classList.add('hidden')
+		notFoundNotice.classList.add('hidden')
+		notSupportedNotice.classList.add('hidden')
+
+		lyricsContainer.classList.remove('hidden')
+	}
+
 	const loadLyrics = async query => {
+		const
+			cache = await chrome.storage.local.get('cache'),
+			cached = cache[query],
+			cacheTTL = 24 * 60 * 60 * 1000 //// 24 hours
+
+		//// https://bugs.chromium.org/p/chromium/issues/detail?id=1472588
+		if (cached && new Date(new Date(cached.createdAt).getTime() + cacheTTL) > new Date()) {
+			return displayLyrics(cached.songTitle, cached.lyricsHTML)
+		}
+
 		const
 			searchURL = `https://genius.com/api/search?q=${query}`,
 			searchResponse = await fetch(searchURL)
@@ -18,33 +60,15 @@ document.addEventListener('DOMContentLoaded', async event => {
 					songData =
 						(await (await fetch(`https://genius.com/api/songs/${firstHit.result.id}`)).json())
 							.response.song,
-					lyricsPage = await (await fetch(songData.description_annotation.url)).text(),
-					parser = new DOMParser(),
-					lyricsDocument = parser.parseFromString(lyricsPage, 'text/html')
+					songTitle = songData.full_title,
+					lyricsPage = await (await fetch(songData.description_annotation.url)).text()
 
-				lyricsContainer.querySelector('.title').innerText = songData.full_title
+				//// Write to cache
+				//// https://bugs.chromium.org/p/chromium/issues/detail?id=1472588
+				cache[query] = { songTitle, lyricsHTML: lyricsPage, createdAt: (new Date()).toString() }
+				chrome.storage.local.set({ cache })
 
-				const
-					lyricsElements =
-						lyricsDocument.querySelector('[data-lyrics-container="true"]') ||
-							lyricsDocument.querySelector('[class^="LyricsPlaceholder__Message"]')
-
-				//// Remove links, they're not working.
-				//// I've tried `.innerText`, it returns value with `\n` in console of a regular page,
-				//// but it returns without `\n` from `DOMParser`.
-				lyricsElements.childNodes.forEach(childNode => {
-					if (childNode.tagName == 'A') {
-						childNode.replaceWith(...childNode.childNodes)
-					}
-				})
-
-				lyricsContainer.querySelector('.text').replaceChildren(lyricsElements)
-
-				loadingNotice.classList.add('hidden')
-				notFoundNotice.classList.add('hidden')
-				notSupportedNotice.classList.add('hidden')
-
-				lyricsContainer.classList.remove('hidden')
+				displayLyrics(songTitle, lyricsPage)
 			} else {
 				loadingNotice.classList.add('hidden')
 				lyricsContainer.classList.add('hidden')
