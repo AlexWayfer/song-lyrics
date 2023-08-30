@@ -19,6 +19,13 @@ body {
 		color: var(--link-color);
 	}
 
+	& input, & button {
+		color: var(--text-color);
+		background-color: var(--background-color);
+		border: 1px solid var(--border-color);
+		border-radius: 5px;
+	}
+
 	.hidden {
 		display: none !important;
 	}
