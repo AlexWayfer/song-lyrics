@@ -3,7 +3,22 @@ document.addEventListener('DOMContentLoaded', async event => {
 		loadingNotice = document.querySelector('.loading'),
 		lyricsContainer = document.querySelector('.lyrics'),
 		notFoundNotice = document.querySelector('.not-found'),
-		notSupportedNotice = document.querySelector('.not-supported')
+		notSupportedNotice = document.querySelector('.not-supported'),
+		loadForm = document.querySelector('form.load'),
+		queryInput = loadForm.querySelector('input[name="query"]')
+
+	loadForm.addEventListener('submit', event => {
+		event.preventDefault()
+
+		notFoundNotice.classList.add('hidden')
+		notSupportedNotice.classList.add('hidden')
+		lyricsContainer.classList.add('hidden')
+
+		loadForm.classList.remove('hidden')
+		loadingNotice.classList.remove('hidden')
+
+		loadLyrics(queryInput.value)
+	})
 
 	const displayLyrics = (songTitle, lyricsHTML) => {
 		const
@@ -35,9 +50,12 @@ document.addEventListener('DOMContentLoaded', async event => {
 		notSupportedNotice.classList.add('hidden')
 
 		lyricsContainer.classList.remove('hidden')
+		loadForm.classList.remove('hidden')
 	}
 
 	const loadLyrics = async query => {
+		queryInput.value = query
+
 		const
 			cache = await chrome.storage.local.get('cache'),
 			cached = cache[query],
@@ -75,6 +93,7 @@ document.addEventListener('DOMContentLoaded', async event => {
 				notSupportedNotice.classList.add('hidden')
 
 				notFoundNotice.classList.remove('hidden')
+				loadForm.classList.remove('hidden')
 			}
 		} else {
 			const problemWindow = open(searchURL, '_blank', 'popup=true')
@@ -169,6 +188,7 @@ document.addEventListener('DOMContentLoaded', async event => {
 			loadingNotice.classList.add('hidden')
 			lyricsContainer.classList.add('hidden')
 			notFoundNotice.classList.add('hidden')
+			loadForm.classList.add('hidden')
 
 			notSupportedNotice.classList.remove('hidden')
 	}

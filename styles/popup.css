@@ -2,15 +2,31 @@ body {
 	font-size: 18px;
 
 	.hidden {
-		display: none;
+		display: none !important;
 	}
 
 	.lyrics {
 		width: 500px;
 	}
 
-	.not-found,
-	.not-supported {
+	& form.load {
+		margin-top: 1em;
+
+		& input, & button, & legend {
+			font-size: 16px;
+		}
+
+		> fieldset {
+			display: flex;
+			padding: 0.2em 0.4em 0.4em;
+
+			& input[name="query"] {
+				flex-grow: 1;
+			}
+		}
+	}
+
+	& .not-found, & .not-supported {
 		color: red;
 		white-space: nowrap;
 	}
