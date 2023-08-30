@@ -78,6 +78,11 @@ document.addEventListener('DOMContentLoaded', async event => {
 			}
 		} else {
 			const problemWindow = open(searchURL, '_blank', 'popup=true')
+
+			problemWindow.addEventListener('load', event => {
+				console.debug('load, event =')
+				console.debug(event)
+			})
 			problemWindow.addEventListener('beforeunload', event => {
 				loadLyrics(query)
 			})
