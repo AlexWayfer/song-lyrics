@@ -59,6 +59,14 @@ body {
 
 			& input[name="query"] {
 				flex-grow: 1;
+				padding: 0.4em 0.8em;
+				border-top-right-radius: 0;
+				border-bottom-right-radius: 0;
+			}
+
+			& button {
+				border-top-left-radius: 0;
+				border-bottom-left-radius: 0;
 			}
 		}
 	}
