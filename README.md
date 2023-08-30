@@ -5,7 +5,7 @@ Chrome Extension for displaying current song lyrics.
 Supported music platforms:
 
 *   [Deezer](https://www.deezer.com/)
-*   [YouTube](https://www.youtube.com/) (without chapters for now)
+*   [YouTube](https://www.youtube.com/) (with chapters)
 *   [Genius](https://genius.com/) (just for testing)
 
 Supported sources:

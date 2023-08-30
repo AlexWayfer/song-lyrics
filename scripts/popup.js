@@ -147,17 +147,33 @@ document.addEventListener('DOMContentLoaded', async event => {
 			chrome.scripting.executeScript({
 				target: { tabId : currentTab.id },
 				func: () => {
-					return document.querySelector('#below #title').innerText
+					return {
+						videoTitle: document.querySelector('#below #title').innerText,
+						channelName: document.querySelector('#below #channel-name').innerText,
+						chapterTitle: document.querySelector('.ytp-chapter-title-content').innerText
+					}
 				}
 			}, injectionResult => {
 				// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				let songTitle = injectionResult[0].result
+				let { videoTitle, channelName, chapterTitle } = injectionResult[0].result
+				let query
+
+				console.debug('videoTitle = ', videoTitle)
+				console.debug('channelName = ', channelName)
+				console.debug('chapterTitle = ', chapterTitle)
+
+				if (chapterTitle) {
+					query = chapterTitle.includes(' - ') ? chapterTitle : `${chapterTitle} ${channelName}`
+				} else {
+					query = videoTitle
+				}
 
 				//// Remove additional notes from song title
-				songTitle = songTitle.replace('(Video)', '').replace(featuringRegexp, '')
+				query = query.replace('(Video)', '').replace(featuringRegexp, '')
 
-				console.debug('songTitle = ', songTitle)
-				loadLyrics(songTitle)
+				console.debug('query = ', query)
+
+				loadLyrics(query)
 			})
 
 			break
