@@ -11,6 +11,13 @@ body {
 		--border-color: var(--text-color);
 	}
 
+	&.dark-theme {
+		--background-color: #222;
+		--text-color: white;
+		--link-color: skyblue;
+		--border-color: #666;
+	}
+
 	&.site-theme {
 		--background-color: var(--site-background-color);
 		--text-color: var(--site-text-color);
