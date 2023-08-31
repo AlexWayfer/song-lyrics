@@ -56,8 +56,10 @@ document.addEventListener('DOMContentLoaded', async event => {
 		})
 
 		//// Split different lyrics containers by newlines
-		lyricsElements =
-			lyricsElements.reduce((acc, val) => [].concat(acc, document.createElement('br'), val))
+		if (lyricsElements.length > 1) {
+			lyricsElements =
+				lyricsElements.reduce((acc, val) => [].concat(acc, document.createElement('br'), val))
+		}
 
 		//// Fill with lyrics
 		lyricsContainer.querySelector('.text').replaceChildren(...lyricsElements)
