@@ -36,21 +36,23 @@ document.addEventListener('DOMContentLoaded', async event => {
 		lyricsContainer.querySelector('.link').href = songData.url
 
 		const
-			lyricsElement =
-				lyricsDocument.querySelector('[data-lyrics-container="true"]') ||
-					lyricsDocument.querySelector('[class^="LyricsPlaceholder__Message"]')
+			lyricsElements =
+				lyricsDocument.querySelectorAll('[data-lyrics-container="true"]') ||
+					lyricsDocument.querySelectorAll('[class^="LyricsPlaceholder__Message"]')
 
 		//// Remove links, they're not working.
 		//// I've tried `.innerText`, it returns value with `\n` in console of a regular page,
 		//// but it returns without `\n` from `DOMParser`.
-		lyricsElement.childNodes.forEach(childNode => {
-			if (childNode.tagName == 'A') {
-				childNode.replaceWith(...childNode.childNodes)
-			}
+		lyricsElements.forEach(lyricsElement => {
+			lyricsElement.childNodes.forEach(childNode => {
+				if (childNode.tagName == 'A') {
+					childNode.replaceWith(...childNode.childNodes)
+				}
+			})
 		})
 
 		//// Fill with lyrics
-		lyricsContainer.querySelector('.text').replaceChildren(lyricsElement)
+		lyricsContainer.querySelector('.text').replaceChildren(...lyricsElements)
 
 		//// Display elements
 		loadingNotice.classList.add('hidden')
