@@ -2,6 +2,8 @@
 
 Chrome Extension for displaying current song lyrics.
 
+[![Chrome Web Store](images/chrome-web-store.png)](https://chrome.google.com/webstore/detail/song-lyrics/fnfipngolkdmolfocahlgjoipplhbmha)
+
 Supported music platforms:
 
 *   [Deezer](https://www.deezer.com/)
