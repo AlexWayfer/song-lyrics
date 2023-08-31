@@ -2,7 +2,11 @@
 
 Chrome Extension for displaying current song lyrics.
 
-[![Chrome Web Store](images/chrome-web-store.png)](https://chrome.google.com/webstore/detail/song-lyrics/fnfipngolkdmolfocahlgjoipplhbmha)
+<p>
+	<a target="_blank" href="https://chrome.google.com/webstore/detail/song-lyrics/fnfipngolkdmolfocahlgjoipplhbmha" >
+		<img src="images/chrome-web-store.png" alt="Chrome Web Store" width="200" />
+	</a>
+</p>
 
 Supported music platforms:
 
