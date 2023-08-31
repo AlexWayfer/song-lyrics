@@ -38,10 +38,11 @@ document.addEventListener('DOMContentLoaded', async event => {
 		lyricsContainer.querySelector('.title').innerText = songData.full_title
 		lyricsContainer.querySelector('.link').href = songData.url
 
-		const
-			lyricsElements =
+		let
+			lyricsElements = Array.from(
 				lyricsDocument.querySelectorAll('[data-lyrics-container="true"]') ||
 					lyricsDocument.querySelectorAll('[class^="LyricsPlaceholder__Message"]')
+			)
 
 		//// Remove links, they're not working.
 		//// I've tried `.innerText`, it returns value with `\n` in console of a regular page,
@@ -53,6 +54,10 @@ document.addEventListener('DOMContentLoaded', async event => {
 				}
 			})
 		})
+
+		//// Split different lyrics containers by newlines
+		lyricsElements =
+			lyricsElements.reduce((acc, val) => [].concat(acc, document.createElement('br'), val))
 
 		//// Fill with lyrics
 		lyricsContainer.querySelector('.text').replaceChildren(...lyricsElements)
