@@ -1,0 +1,14 @@
+body {
+	font-size: 18px;
+
+	& fieldset {
+		padding: 0.2em 0.4em 0.4em;
+		border: 1px solid silver;
+		border-radius: 5px;
+
+		&.theme label {
+			display: block;
+			padding: 0.2em 0.2em;
+		}
+	}
+}

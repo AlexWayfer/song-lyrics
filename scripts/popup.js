@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', async event => {
+	const currentSettings = (await chrome.storage.sync.get({ settings: {} })).settings
+	document.body.classList.add(`${currentSettings.theme}-theme`)
+
 	const
 		loadingNotice = document.querySelector('.loading'),
 		lyricsContainer = document.querySelector('.lyrics'),
@@ -21,10 +24,10 @@ document.addEventListener('DOMContentLoaded', async event => {
 	})
 
 	const setColors = (colors) => {
-		document.documentElement.style.setProperty('--background-color', colors.background);
-		document.documentElement.style.setProperty('--text-color', colors.text);
-		document.documentElement.style.setProperty('--link-color', colors.link);
-		document.documentElement.style.setProperty('--border-color', colors.border);
+		document.documentElement.style.setProperty('--site-background-color', colors.background);
+		document.documentElement.style.setProperty('--site-text-color', colors.text);
+		document.documentElement.style.setProperty('--site-link-color', colors.link);
+		document.documentElement.style.setProperty('--site-border-color', colors.border);
 	}
 
 	const displayLyrics = (songData, lyricsHTML) => {

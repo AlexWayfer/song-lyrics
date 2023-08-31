@@ -18,6 +18,10 @@
 	"background": {
 		"service_worker": "scripts/service-worker.js"
 	},
+	"options_ui": {
+		"page": "pages/options.html",
+		"open_in_tab": false
+	},
 	"permissions": [
 		"activeTab",
 		"contextMenus",

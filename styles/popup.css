@@ -1,15 +1,22 @@
-:root {
-	--background-color: white;
-	--text-color: black;
-	--link-color: blue;
-	--border-color: var(--text-color);
-}
-
 body {
 	font-size: 18px;
 	margin: 0;
 	padding: 10px;
 	border-radius: 5px;
+
+	&.light-theme {
+		--background-color: white;
+		--text-color: black;
+		--link-color: blue;
+		--border-color: var(--text-color);
+	}
+
+	&.site-theme {
+		--background-color: var(--site-background-color);
+		--text-color: var(--site-text-color);
+		--link-color: var(--site-link-color);
+		--border-color: var(--site-border-color);
+	}
 
 	background-color: var(--background-color);
 	color: var(--text-color);

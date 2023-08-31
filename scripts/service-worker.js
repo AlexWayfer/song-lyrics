@@ -8,7 +8,7 @@ chrome.contextMenus.onClicked.addListener(info => {
 	}
 })
 
-chrome.runtime.onInstalled.addListener(_details => {
+chrome.runtime.onInstalled.addListener(async _details => {
 	console.debug('context menu create')
 
 	chrome.contextMenus.create({
@@ -16,4 +16,8 @@ chrome.runtime.onInstalled.addListener(_details => {
 		contexts: ['action'],
 		id: 'clear-cache'
 	})
+
+	const currentSettings = (await chrome.storage.sync.get({ settings: {} })).settings
+	currentSettings.theme ??= 'site'
+	chrome.storage.sync.set({ settings: currentSettings })
 })
