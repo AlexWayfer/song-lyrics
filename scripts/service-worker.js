@@ -19,5 +19,6 @@ chrome.runtime.onInstalled.addListener(async _details => {
 
 	const currentSettings = (await chrome.storage.sync.get({ settings: {} })).settings
 	currentSettings.theme ??= 'site'
+	currentSettings.displaySongArt ??= true
 	chrome.storage.sync.set({ settings: currentSettings })
 })

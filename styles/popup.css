@@ -47,12 +47,23 @@ body {
 	.lyrics {
 		width: 500px;
 
-		.title {
-			margin-bottom: 0.2em;
-		}
+		.header {
+			display: flex;
 
-		.link {
-			font-size: 0.9em;
+			.song-art {
+				width: 150px;
+				margin-right: 0.8em;
+			}
+
+			.right-part {
+				.title {
+					margin: 0.2em 0;
+				}
+
+				.link {
+					font-size: 0.9em;
+				}
+			}
 		}
 
 		.text {

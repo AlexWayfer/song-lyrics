@@ -38,6 +38,14 @@ document.addEventListener('DOMContentLoaded', async event => {
 		lyricsContainer.querySelector('.title').innerText = songData.full_title
 		lyricsContainer.querySelector('.link').href = songData.url
 
+		const songArtImage = lyricsContainer.querySelector('img.song-art')
+		if (currentSettings.displaySongArt) {
+			songArtImage.src = songData.song_art_image_thumbnail_url
+			songArtImage.classList.remove('hidden')
+		} else {
+			songArtImage.classList.add('hidden')
+		}
+
 		let
 			lyricsElements = Array.from(
 				lyricsDocument.querySelectorAll('[data-lyrics-container="true"]') ||
