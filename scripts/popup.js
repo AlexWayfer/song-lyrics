@@ -27,13 +27,13 @@ document.addEventListener('DOMContentLoaded', async event => {
 		document.documentElement.style.setProperty('--border-color', colors.border);
 	}
 
-	const displayLyrics = (songTitle, lyricsHTML, songLink) => {
+	const displayLyrics = (songData, lyricsHTML) => {
 		const
 			parser = new DOMParser(),
 			lyricsDocument = parser.parseFromString(lyricsHTML, 'text/html')
 
-		lyricsContainer.querySelector('.title').innerText = songTitle
-		lyricsContainer.querySelector('.link').href = songLink
+		lyricsContainer.querySelector('.title').innerText = songData.full_title
+		lyricsContainer.querySelector('.link').href = songData.url
 
 		const
 			lyricsElement =
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', async event => {
 
 		//// https://bugs.chromium.org/p/chromium/issues/detail?id=1472588
 		if (cached && new Date(new Date(cached.createdAt).getTime() + cacheTTL) > new Date()) {
-			return displayLyrics(cached.songTitle, cached.lyricsHTML, cached.songLink)
+			return displayLyrics(cached.songData, cached.lyricsHTML)
 		}
 
 		const
@@ -89,18 +89,14 @@ document.addEventListener('DOMContentLoaded', async event => {
 					songData =
 						(await (await fetch(`https://genius.com/api/songs/${firstHit.result.id}`)).json())
 							.response.song,
-					songTitle = songData.full_title,
-					songLink = songData.url,
 					lyricsPage = await (await fetch(songData.description_annotation.url)).text()
 
 				//// Write to cache
 				//// https://bugs.chromium.org/p/chromium/issues/detail?id=1472588
-				cache[query] = {
-						songTitle, lyricsHTML: lyricsPage, songLink, createdAt: (new Date()).toString()
-				}
+				cache[query] = { songData, lyricsHTML: lyricsPage, createdAt: (new Date()).toString() }
 				chrome.storage.local.set({ cache })
 
-				displayLyrics(songTitle, lyricsPage, songLink)
+				displayLyrics(songData, lyricsPage)
 			} else {
 				loadingNotice.classList.add('hidden')
 				lyricsContainer.classList.add('hidden')
