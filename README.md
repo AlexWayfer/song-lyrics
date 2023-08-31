@@ -12,6 +12,11 @@ Supported sources:
 
 *   [Genius](https://genius.com/)
 
+Options:
+
+*   Theme selection: site (default), light or dark
+*   Displaying song art / album cover (default) or not
+
 ## Credentials
 
 Icon: https://www.flaticon.com/free-icon/song-lyrics_6887372
