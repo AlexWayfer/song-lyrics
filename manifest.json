@@ -15,8 +15,12 @@
 		"256": "images/icons/256.png",
 		"512": "images/icons/512.png"
 	},
+	"background": {
+		"service_worker": "scripts/service-worker.js"
+	},
 	"permissions": [
 		"activeTab",
+		"contextMenus",
 		"scripting",
 		"storage"
 	],
