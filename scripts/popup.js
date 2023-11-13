@@ -37,6 +37,9 @@ document.addEventListener('DOMContentLoaded', async event => {
 			parser = new DOMParser(),
 			lyricsDocument = parser.parseFromString(lyricsHTML, 'text/html')
 
+		// console.debug(lyricsDocument)
+		// console.debug(lyricsDocument.querySelectorAll('[class^="LyricsPlaceholder__Message"]'))
+
 		lyricsContainer.querySelector('.title').innerText = songData.full_title
 		lyricsContainer.querySelector('.link').href = songData.url
 
@@ -49,10 +52,14 @@ document.addEventListener('DOMContentLoaded', async event => {
 		}
 
 		let
-			lyricsElements = Array.from(
-				lyricsDocument.querySelectorAll('[data-lyrics-container="true"]') ||
-					lyricsDocument.querySelectorAll('[class^="LyricsPlaceholder__Message"]')
-			)
+			lyricsElements = Array.from(lyricsDocument.querySelectorAll('[data-lyrics-container="true"]'))
+
+		if (lyricsElements.length == 0) {
+			lyricsElements =
+				Array.from(lyricsDocument.querySelectorAll('[class^="LyricsPlaceholder__Message"]'))
+		}
+
+		// console.debug(lyricsElements)
 
 		//// Remove links, they're not working.
 		//// I've tried `.innerText`, it returns value with `\n` in console of a regular page,
