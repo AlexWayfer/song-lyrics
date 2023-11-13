@@ -167,10 +167,13 @@ document.addEventListener('DOMContentLoaded', async event => {
 			chrome.scripting.executeScript({
 				target: { tabId : currentTab.id },
 				func: () => {
-					const documentStyle = getComputedStyle(document.documentElement)
+					const
+						documentStyle = getComputedStyle(document.documentElement),
+						pagePlayer = document.querySelector('#page_player')
 
 					return {
-						songTitle: document.querySelector('#page_player .track-title').innerText,
+						songName: pagePlayer.querySelector('[data-testid="item_title"]').innerText,
+						songArtists: pagePlayer.querySelector('[data-testid="item_subtitle"]').innerText,
 						colors: {
 							background: documentStyle.getPropertyValue('--tempo-colors-bg-main'),
 							text: documentStyle.getPropertyValue('--tempo-colors-text-main'),
@@ -182,10 +185,8 @@ document.addEventListener('DOMContentLoaded', async event => {
 			}, injectionResult => {
 				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
 				let
-					{ songTitle, colors } = injectionResult[0].result,
-					[songName, songArtists] = songTitle.split(' · ', 2)
+					{ songName, songArtists, colors } = injectionResult[0].result
 
-				console.debug('songTitle = ', songTitle)
 				console.debug('songName = ', songName)
 				console.debug('songArtists = ', songArtists)
 
