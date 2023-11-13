@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', async event => {
 
 	const
 		loadingNotice = document.querySelector('.loading'),
+		captchaNotice = document.querySelector('.captcha'),
 		lyricsContainer = document.querySelector('.lyrics'),
 		notFoundNotice = document.querySelector('.not-found'),
 		notSupportedNotice = document.querySelector('.not-supported'),
@@ -13,6 +14,7 @@ document.addEventListener('DOMContentLoaded', async event => {
 	loadForm.addEventListener('submit', event => {
 		event.preventDefault()
 
+		captchaNotice.classList.add('hidden')
 		notFoundNotice.classList.add('hidden')
 		notSupportedNotice.classList.add('hidden')
 		lyricsContainer.classList.add('hidden')
@@ -74,6 +76,7 @@ document.addEventListener('DOMContentLoaded', async event => {
 
 		//// Display elements
 		loadingNotice.classList.add('hidden')
+		captchaNotice.classList.add('hidden')
 		notFoundNotice.classList.add('hidden')
 		notSupportedNotice.classList.add('hidden')
 
@@ -119,6 +122,7 @@ document.addEventListener('DOMContentLoaded', async event => {
 				displayLyrics(songData, lyricsPage)
 			} else {
 				loadingNotice.classList.add('hidden')
+				captchaNotice.classList.add('hidden')
 				lyricsContainer.classList.add('hidden')
 				notSupportedNotice.classList.add('hidden')
 
@@ -126,6 +130,19 @@ document.addEventListener('DOMContentLoaded', async event => {
 				loadForm.classList.remove('hidden')
 			}
 		} else {
+			const searchResponseText = await searchResponse.text()
+
+			// console.debug(searchResponse.status)
+			// console.debug(searchResponseText)
+
+			if (
+				searchResponse.status == 403 &&
+				searchResponseText.includes("we have to make sure you're a human")
+			) {
+				loadingNotice.classList.add('hidden')
+				captchaNotice.classList.remove('hidden')
+			}
+
 			const problemWindow = open(searchURL, '_blank', 'popup=true')
 
 			problemWindow.addEventListener('load', event => {
