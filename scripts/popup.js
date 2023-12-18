@@ -92,6 +92,8 @@ document.addEventListener('DOMContentLoaded', async event => {
 	}
 
 	const loadLyrics = async query => {
+		query = query.trim()
+
 		queryInput.value = query
 
 		const
