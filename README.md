@@ -12,6 +12,7 @@ Supported music platforms:
 
 *   [Deezer](https://www.deezer.com/)
 *   [YouTube](https://www.youtube.com/) (with chapters)
+*   [Shazam](https://www.shazam.com/)
 *   [Genius](https://genius.com/) (just for testing)
 
 Supported sources:
