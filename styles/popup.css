@@ -2,7 +2,6 @@ body {
 	font-size: 18px;
 	margin: 0;
 	padding: 10px;
-	border-radius: 5px;
 
 	&.light-theme {
 		--background-color: white;
@@ -27,7 +26,6 @@ body {
 
 	background-color: var(--background-color);
 	color: var(--text-color);
-	border: 1px solid var(--border-color);
 
 	& a {
 		color: var(--link-color);
