@@ -319,6 +319,9 @@ document.addEventListener('DOMContentLoaded', async event => {
 				console.debug('songTitle = ', songTitle)
 				console.debug('songArtist = ', songArtist)
 
+				songTitle = songTitle.replace(featuringRegexp, '')
+				songArtist = songArtist.trim()
+
 				setColors(colors)
 
 				loadLyrics(`${songTitle} ${songArtist}`)
