@@ -296,6 +296,35 @@ document.addEventListener('DOMContentLoaded', async event => {
 			})
 
 			break
+		case 'shazam.com':
+		case 'www.shazam.com':
+			chrome.scripting.executeScript({
+				target: { tabId : currentTab.id },
+				func: () => {
+					return {
+						songTitle: document.querySelector('h1.title').innerText,
+						songArtist: document.querySelector('h2.artist').innerText,
+						colors: {
+							background: getComputedStyle(document.querySelector('body')).backgroundColor,
+							text: getComputedStyle(document.querySelector('h2.section-title')).color,
+							link: getComputedStyle(document.querySelector('.shz-text-btn')).backgroundColor,
+							border: getComputedStyle(document.querySelector('.shz-partial-tracklist')).borderColor
+						}
+					}
+				}
+			}, injectionResult => {
+				// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				let { songTitle, songArtist, colors } = injectionResult[0].result
+
+				console.debug('songTitle = ', songTitle)
+				console.debug('songArtist = ', songArtist)
+
+				setColors(colors)
+
+				loadLyrics(`${songTitle} ${songArtist}`)
+			})
+
+			break
 		default:
 			loadingNotice.classList.add('hidden')
 			lyricsContainer.classList.add('hidden')
