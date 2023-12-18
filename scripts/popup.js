@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', async event => {
 						pagePlayer = document.querySelector('#page_player')
 
 					return {
-						songName: pagePlayer.querySelector('[data-testid="item_title"]').innerText,
+						songTitle: pagePlayer.querySelector('[data-testid="item_title"]').innerText,
 						songArtists: pagePlayer.querySelector('[data-testid="item_subtitle"]').innerText,
 						colors: {
 							background: documentStyle.getPropertyValue('--tempo-colors-bg-main'),
@@ -192,16 +192,16 @@ document.addEventListener('DOMContentLoaded', async event => {
 			}, injectionResult => {
 				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
 				let
-					{ songName, songArtists, colors } = injectionResult[0].result
+					{ songTitle, songArtists, colors } = injectionResult[0].result
 
-				console.debug('songName = ', songName)
+				console.debug('songTitle = ', songTitle)
 				console.debug('songArtists = ', songArtists)
 
-				songName = songName.replace(featuringRegexp, '')
+				songTitle = songTitle.replace(featuringRegexp, '')
 				//// Take only the first artist, second can be from the featuring
 				songArtist = songArtists.split(', ', 2)[0]
 
-				const query = `${songName} ${songArtist}`
+				const query = `${songTitle} ${songArtist}`
 				console.debug('query = ', query)
 
 				setColors(colors)
