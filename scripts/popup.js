@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', async event => {
 					const documentStyle = getComputedStyle(document.documentElement)
 
 					return {
-						videoTitle: document.querySelector('#below #title').innerText,
+						videoTitle: document.querySelector('#below #title h1').innerText,
 						channelName: document.querySelector('#below #channel-name').innerText,
 						chapterTitle: document.querySelector('.ytp-chapter-title-content').innerText,
 						colors: {
