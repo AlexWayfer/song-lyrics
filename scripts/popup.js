@@ -263,12 +263,15 @@ document.addEventListener('DOMContentLoaded', async event => {
 				target: { tabId : currentTab.id },
 				func: () => {
 					const
-						lyricsStyle =
-							getComputedStyle(document.querySelector('[data-lyrics-container="true"]')),
-						recommendedArtistStyle =
-							getComputedStyle(document.querySelector('[class^="RecommendedSong__ArtistName"]')),
-						recommendedContainerStyle =
-							getComputedStyle(document.querySelector('[class^="RecommendedSongs__Container"]'))
+						lyricsStyle = getComputedStyle(
+							document.querySelector('[data-lyrics-container="true"]')
+						),
+						contributorsCreditStyle = getComputedStyle(
+							document.querySelector('[class^="ContributorsCreditSong__Label"]')
+						),
+						stickyContributorToolbarStyle = getComputedStyle(
+							document.querySelector('[class*=" StickyContributorToolbar__Container"]')
+						)
 
 					return {
 						songTitle:
@@ -280,12 +283,14 @@ document.addEventListener('DOMContentLoaded', async event => {
 						colors: {
 							background: lyricsStyle.backgroundColor,
 							text: lyricsStyle.color,
-							link: recommendedArtistStyle.color,
-							border: recommendedContainerStyle.borderColor
+							link: contributorsCreditStyle.color,
+							border: stickyContributorToolbarStyle.borderBottomColor
 						}
 					}
 				}
 			}, injectionResult => {
+				console.debug('injectionResult = ', injectionResult)
+
 				// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
 				let { songTitle, songArtist, colors } = injectionResult[0].result
 
