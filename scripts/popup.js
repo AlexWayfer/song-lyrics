@@ -152,16 +152,17 @@ document.addEventListener('DOMContentLoaded', async event => {
 				captchaNotice.classList.remove('hidden')
 			}
 
-			const problemWindow = open(searchURL, '_blank', 'popup=true')
+			const problemWindow = window.open('https://genius.com/', '_blank', 'popup=true')
 
-			problemWindow.addEventListener('load', event => {
-				console.debug('problemWindow load, event =')
-				console.debug(event)
-			})
-			problemWindow.addEventListener('beforeunload', event => {
-				console.debug('problemWindow before unload', event)
-				loadLyrics(query)
-			})
+			// console.debug('problemWindow = ', problemWindow)
+
+			//// It will not work due to security policies (CORS).
+			//// Even via Facebook's `setInterval` hack (`.open` always returns `true`).
+			//
+			// problemWindow.addEventListener('beforeunload', event => {
+			// 	console.debug('problemWindow before unload', event)
+			// 	loadLyrics(query)
+			// })
 		}
 	}
 
