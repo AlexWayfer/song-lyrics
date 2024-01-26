@@ -1,5 +1,10 @@
+import { FastAverageColor } from 'fast-average-color'
+
 document.addEventListener('DOMContentLoaded', async event => {
-	const currentSettings = (await chrome.storage.sync.get({ settings: {} })).settings
+	const
+		FAC = new FastAverageColor(),
+		currentSettings = (await chrome.storage.sync.get({ settings: {} })).settings
+
 	document.body.classList.add(`${currentSettings.theme}-theme`)
 
 	const
@@ -44,9 +49,15 @@ document.addEventListener('DOMContentLoaded', async event => {
 		lyricsContainer.querySelector('.link').href = songData.url
 
 		const songArtImage = lyricsContainer.querySelector('img.song-art')
+
 		if (currentSettings.displaySongArt) {
 			songArtImage.src = songData.song_art_image_thumbnail_url
 			songArtImage.classList.remove('hidden')
+
+			FAC.getColorAsync(songArtImage)
+				.then(color => {
+					document.documentElement.style.setProperty('--song-art-color', color.rgb)
+				})
 		} else {
 			songArtImage.classList.add('hidden')
 		}

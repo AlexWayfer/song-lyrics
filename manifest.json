@@ -16,7 +16,7 @@
 		"512": "images/icons/512.png"
 	},
 	"background": {
-		"service_worker": "scripts/service-worker.js"
+		"service_worker": "scripts/compiled/service-worker.js"
 	},
 	"options_ui": {
 		"page": "pages/options.html",

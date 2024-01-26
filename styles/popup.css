@@ -1,7 +1,8 @@
 body {
+	--body-padding: 10px;
+
 	font-size: 18px;
 	margin: 0;
-	padding: 10px;
 
 	&.light-theme {
 		--background-color: white;
@@ -27,6 +28,10 @@ body {
 	background-color: var(--background-color);
 	color: var(--text-color);
 
+	& > * {
+		padding: var(--body-padding);
+	}
+
 	& a {
 		color: var(--link-color);
 	}
@@ -44,9 +49,16 @@ body {
 
 	.lyrics {
 		width: 500px;
+		padding: 0;
+
+		& > * {
+			padding: var(--body-padding);
+		}
 
 		.header {
 			display: flex;
+
+			background: linear-gradient(165deg, var(--song-art-color), transparent 75%);
 
 			.song-art {
 				width: 150px;

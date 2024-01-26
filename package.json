@@ -1,8 +1,20 @@
 {
+	"dependencies": {
+		"fast-average-color": "^9.4.0"
+	},
 	"devDependencies": {
-		"archiver": "^6.0.0"
+		"@rollup/plugin-commonjs": "^25.0.7",
+		"@rollup/plugin-node-resolve": "^15.2.3",
+		"archiver": "^6.0.0",
+		"rollup": "^4.9.6",
+		"rollup-plugin-multi-input": "^1.4.1",
+		"rollup-plugin-notify": "^1.1.0"
 	},
 	"scripts": {
+		"build:scripts": "rollup -c",
+		"build": "pnpm run build:scripts",
+		"watch:scripts": "pnpm run build:scripts --watch",
+		"watch": "pnpm run watch:scripts",
 		"pack": "node exe/pack.js",
 		"release": "node exe/release.js"
 	}
