@@ -31,10 +31,10 @@ document.addEventListener('DOMContentLoaded', async event => {
 	})
 
 	const setColors = (colors) => {
-		document.documentElement.style.setProperty('--site-background-color', colors.background);
-		document.documentElement.style.setProperty('--site-text-color', colors.text);
-		document.documentElement.style.setProperty('--site-link-color', colors.link);
-		document.documentElement.style.setProperty('--site-border-color', colors.border);
+		document.documentElement.style.setProperty('--site-background-color', colors.background)
+		document.documentElement.style.setProperty('--site-text-color', colors.text)
+		document.documentElement.style.setProperty('--site-link-color', colors.link)
+		document.documentElement.style.setProperty('--site-border-color', colors.border)
 	}
 
 	const displayLyrics = (songData, lyricsHTML) => {
