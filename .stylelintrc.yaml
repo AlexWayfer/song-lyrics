@@ -1,0 +1,67 @@
+extends:
+  - stylelint-config-standard
+  - '@stylistic/stylelint-config'
+
+ignorePath: .gitignore
+
+rules:
+  '@stylistic/indentation':
+    - tab
+
+  '@stylistic/max-line-length':
+    - 100
+    - ignorePattern: /// https?:///
+
+  no-invalid-position-at-import-rule: null
+
+  at-rule-empty-line-before:
+    - always
+    - except:
+        - first-nested
+      ignore:
+        - after-comment
+        - blockless-after-same-name-blockless
+      ignoreAtRules:
+        - else
+
+  '@stylistic/block-closing-brace-newline-after':
+    - always
+    - ignoreAtRules:
+        - if
+        - else
+
+  '@stylistic/declaration-colon-newline-after': null
+
+  '@stylistic/function-comma-newline-after': null
+
+  declaration-empty-line-before:
+    - always
+    - except:
+        - first-nested
+      ignore:
+        - after-comment
+        - after-declaration
+
+  declaration-block-no-redundant-longhand-properties:
+    - true
+    - severity: warning
+
+  '@stylistic/declaration-colon-space-after':
+    - always-single-line
+
+  ## This selectors could not be sorted by specificity:
+  # .scrollable { // 0-1-0
+  #   table {} // 0-1-1
+  # }
+  #
+  # a + .scrollable, // 0-1-1
+  # a + table { // 0-0-2
+  # }
+  ## Specifity specification: https://www.w3.org/TR/selectors-3/#specificity
+  no-descending-specificity: null
+
+  ## https://github.com/stylelint/stylelint/issues/4622
+  value-keyword-case:
+    - lower
+    - ignoreKeywords:
+      - BlinkMacSystemFont
