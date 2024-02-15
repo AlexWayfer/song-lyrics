@@ -8,6 +8,7 @@ node_modules_cache: &node_modules_cache
       - echo $CIRRUS_OS
       - cat package.json
   install_script:
+    - npm install -g pnpm
     - pnpm install
 
 remark_task:
