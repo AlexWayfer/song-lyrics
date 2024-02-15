@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 	document.querySelectorAll('input[name="theme"]').forEach(input => {
 		input.addEventListener('change', event => {
 			const newValue = event.target.value
-			console.debug(`theme input change to ${newValue}`)
+			// console.debug(`theme input change to ${newValue}`)
 			currentSettings.theme = newValue
 			chrome.storage.sync.set({ settings: currentSettings })
 		})
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 	songArtCheckbox.addEventListener('change', event => {
 		const checked = event.target.checked
-		console.debug(`song-art input change to ${checked}`)
+		// console.debug(`song-art input change to ${checked}`)
 		currentSettings.displaySongArt = checked
 		chrome.storage.sync.set({ settings: currentSettings })
 	})

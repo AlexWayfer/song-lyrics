@@ -40,7 +40,7 @@ output.on('end', () => {
 archive.on('warning', err => {
 	if (err.code === 'ENOENT') {
 		// log warning
-		console.warning(err)
+		console.warn(err)
 	} else {
 		// throw error
 		throw err

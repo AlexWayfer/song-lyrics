@@ -1,6 +1,6 @@
 import { FastAverageColor } from 'fast-average-color'
 
-document.addEventListener('DOMContentLoaded', async event => {
+document.addEventListener('DOMContentLoaded', async _event => {
 	const
 		FAC = new FastAverageColor(),
 		currentSettings = (await chrome.storage.sync.get({ settings: {} })).settings
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async event => {
 		loadLyrics(queryInput.value)
 	})
 
-	const setColors = (colors) => {
+	const setColors = colors => {
 		document.documentElement.style.setProperty('--site-background-color', colors.background)
 		document.documentElement.style.setProperty('--site-text-color', colors.text)
 		document.documentElement.style.setProperty('--site-link-color', colors.link)
@@ -163,7 +163,8 @@ document.addEventListener('DOMContentLoaded', async event => {
 				captchaNotice.classList.remove('hidden')
 			}
 
-			const problemWindow = window.open('https://genius.com/', '_blank', 'popup=true')
+			// const problemWindow =
+			window.open('https://genius.com/', '_blank', 'popup=true')
 
 			// console.debug('problemWindow = ', problemWindow)
 
@@ -182,11 +183,11 @@ document.addEventListener('DOMContentLoaded', async event => {
 		currentTabHostname = (new URL(currentTab.url)).hostname,
 		featuringRegexp = / \(?f(ea)?t\.? .+\)?/
 
-	switch(currentTabHostname) {
+	switch (currentTabHostname) {
 		case 'deezer.com':
 		case 'www.deezer.com':
 			chrome.scripting.executeScript({
-				target: { tabId : currentTab.id },
+				target: { tabId: currentTab.id },
 				func: () => {
 					const
 						documentStyle = getComputedStyle(document.documentElement),
@@ -213,7 +214,7 @@ document.addEventListener('DOMContentLoaded', async event => {
 
 				songTitle = songTitle.replace(featuringRegexp, '')
 				//// Take only the first artist, second can be from the featuring
-				songArtist = songArtists.split(', ', 2)[0]
+				let songArtist = songArtists.split(', ', 2)[0]
 
 				const query = `${songTitle} ${songArtist}`
 				console.debug('query = ', query)
@@ -227,7 +228,7 @@ document.addEventListener('DOMContentLoaded', async event => {
 		case 'youtube.com':
 		case 'www.youtube.com':
 			chrome.scripting.executeScript({
-				target: { tabId : currentTab.id },
+				target: { tabId: currentTab.id },
 				func: () => {
 					const documentStyle = getComputedStyle(document.documentElement)
 
@@ -272,7 +273,7 @@ document.addEventListener('DOMContentLoaded', async event => {
 		case 'genius.com':
 		case 'www.genius.com':
 			chrome.scripting.executeScript({
-				target: { tabId : currentTab.id },
+				target: { tabId: currentTab.id },
 				func: () => {
 					const
 						lyricsStyle = getComputedStyle(
@@ -318,19 +319,17 @@ document.addEventListener('DOMContentLoaded', async event => {
 		case 'shazam.com':
 		case 'www.shazam.com':
 			chrome.scripting.executeScript({
-				target: { tabId : currentTab.id },
-				func: () => {
-					return {
-						songTitle: document.querySelector('h1.title').innerText,
-						songArtist: document.querySelector('h2.artist').innerText,
-						colors: {
-							background: getComputedStyle(document.querySelector('body')).backgroundColor,
-							text: getComputedStyle(document.querySelector('h2.section-title')).color,
-							link: getComputedStyle(document.querySelector('.shz-text-btn')).backgroundColor,
-							border: getComputedStyle(document.querySelector('.shz-partial-tracklist')).borderColor
-						}
+				target: { tabId: currentTab.id },
+				func: () => ({
+					songTitle: document.querySelector('h1.title').innerText,
+					songArtist: document.querySelector('h2.artist').innerText,
+					colors: {
+						background: getComputedStyle(document.querySelector('body')).backgroundColor,
+						text: getComputedStyle(document.querySelector('h2.section-title')).color,
+						link: getComputedStyle(document.querySelector('.shz-text-btn')).backgroundColor,
+						border: getComputedStyle(document.querySelector('.shz-partial-tracklist')).borderColor
 					}
-				}
+				})
 			}, injectionResult => {
 				// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
 				let { songTitle, songArtist, colors } = injectionResult[0].result

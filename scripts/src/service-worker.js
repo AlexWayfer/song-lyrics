@@ -9,8 +9,6 @@ chrome.contextMenus.onClicked.addListener(info => {
 })
 
 chrome.runtime.onInstalled.addListener(async _details => {
-	console.debug('context menu create')
-
 	chrome.contextMenus.create({
 		title: 'Clear lyrics cache',
 		contexts: ['action'],
