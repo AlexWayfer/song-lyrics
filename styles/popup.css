@@ -36,7 +36,8 @@ body {
 		color: var(--link-color);
 	}
 
-	& input, & button {
+	& input,
+	& button {
 		color: var(--text-color);
 		background-color: var(--background-color);
 		border: 1px solid var(--border-color);
@@ -85,7 +86,9 @@ body {
 	& form.load {
 		margin-top: 1em;
 
-		& input, & button, & legend {
+		& input,
+		& button,
+		& legend {
 			font-size: 16px;
 		}
 
@@ -107,7 +110,8 @@ body {
 		}
 	}
 
-	& .not-found, & .not-supported {
+	& .not-found,
+	& .not-supported {
 		color: red;
 		white-space: nowrap;
 	}
