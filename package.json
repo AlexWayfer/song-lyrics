@@ -7,6 +7,7 @@
 		"@rollup/plugin-node-resolve": "^15.2.3",
 		"@stylistic/stylelint-config": "^1.0.1",
 		"archiver": "^6.0.0",
+		"eslint": "^8.56.0",
 		"remark-cli": "^12.0.0",
 		"remark-gfm": "^4.0.0",
 		"remark-preset-lint-recommended": "^6.1.3",
@@ -19,7 +20,8 @@
 	"scripts": {
 		"lint:docs": "remark -f .",
 		"lint:styles": "stylelint styles/",
-		"lint": "pnpm run lint:docs; docs_lint_result=$?; pnpm run lint:styles; styles_lint_result=$?; [ $styles_lint_result -eq 0 ] && [ $docs_lint_result -eq 0 ]",
+		"lint:scripts": "eslint --ignore-path .gitignore --ext .js,.mjs .",
+		"lint": "pnpm run lint:docs; docs_lint_result=$?; pnpm run lint:styles; styles_lint_result=$?; pnpm run lint:scripts && [ $styles_lint_result -eq 0 ] && [ $docs_lint_result -eq 0 ]",
 		"build:scripts": "rollup -c",
 		"build": "pnpm run build:scripts",
 		"watch:scripts": "pnpm run build:scripts --watch",
