@@ -1,3 +1,6 @@
+container:
+  image: node:latest
+
 node_modules_cache: &node_modules_cache
   node_modules_cache:
     folder: node_modules
