@@ -6,8 +6,7 @@ node_modules_cache: &node_modules_cache
     folder: node_modules
     fingerprint_script:
       - echo $CIRRUS_OS
-      - cat .node-version
-      - cat pnpm-lock.yaml
+      - cat package.json
   install_script:
     - npm install -g pnpm
     - pnpm install
