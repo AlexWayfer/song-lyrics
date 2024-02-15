@@ -3,7 +3,7 @@ import { FastAverageColor } from 'fast-average-color'
 document.addEventListener('DOMContentLoaded', async _event => {
 	const
 		FAC = new FastAverageColor(),
-		currentSettings = (await chrome.storage.sync.get({ settings: {} })).settings
+		currentSettings = (await chrome.storage.sync.get('settings')).settings
 
 	document.body.classList.add(`${currentSettings.theme}-theme`)
 
