@@ -1,5 +1,8 @@
 # Song Lyrics
 
+[![Cirrus CI - Base Branch Build Status](https://img.shields.io/cirrus/github/AlexWayfer/song-lyrics?style=flat-square)](https://cirrus-ci.com/github/AlexWayfer/song-lyrics)
+[![Depfu](https://img.shields.io/depfu/AlexWayfer/song-lyrics?style=flat-square)](https://depfu.com/repos/github/AlexWayfer/song-lyrics)
+
 Chrome Extension for displaying current song lyrics.
 
 <p>
