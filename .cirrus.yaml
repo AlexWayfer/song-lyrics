@@ -1,0 +1,43 @@
+node_modules_cache: &node_modules_cache
+  node_modules_cache:
+    folder: node_modules
+    fingerprint_script:
+      - echo $CIRRUS_OS
+      - cat .node-version
+      - cat pnpm-lock.yaml
+  install_script:
+    - npm install -g pnpm
+    - pnpm install
+
+remark_task:
+  <<: *node_modules_cache
+
+  lint_script: pnpm run lint:docs
+
+  only_if: ($CIRRUS_BRANCH == 'main') ||
+    changesInclude(
+      '.cirrus.yaml', '.gitignore', 'package.json',
+      '.remark*', '**.md'
+    )
+
+stylelint_task:
+  <<: *node_modules_cache
+
+  lint_script: pnpm run lint:styles
+
+  only_if: ($CIRRUS_BRANCH == 'main') ||
+    changesInclude(
+      '.cirrus.yaml', '.gitignore', 'package.json',
+      '.stylelint*', 'styles/**'
+    )
+
+eslint_task:
+  <<: *node_modules_cache
+
+  lint_script: pnpm run lint:scripts
+
+  only_if: ($CIRRUS_BRANCH == 'main') ||
+    changesInclude(
+      '.cirrus.yaml', '.gitignore', 'package.json',
+      '.eslint*', 'scripts/**', 'exe/*.js', '*.{,m}js'
+    )
