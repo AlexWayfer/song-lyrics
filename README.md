@@ -26,4 +26,4 @@ Options:
 
 ## Credentials
 
-Icon: https://www.flaticon.com/free-icon/song-lyrics_6887372
+*   [Icon](https://www.flaticon.com/free-icon/song-lyrics_6887372)
