@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', async _event => {
 	const
+		currentSettings = (await chrome.storage.sync.get({ settings: {} })).settings,
 		songArtCheckbox = document.querySelector('input[name="song-art"]')
 
 	document.querySelectorAll('input[name="theme"]').forEach(input => {
@@ -17,9 +18,6 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		currentSettings.displaySongArt = checked
 		chrome.storage.sync.set({ settings: currentSettings })
 	})
-
-	//// Initialize current settings
-	const currentSettings = (await chrome.storage.sync.get({ settings: {} })).settings
 
 	document.querySelector(`input[name="theme"][value=${currentSettings.theme}]`).checked = true
 
