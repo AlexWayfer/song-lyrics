@@ -277,7 +277,12 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				func: () => {
 					const
 						lyricsStyle = getComputedStyle(
-							document.querySelector('[data-lyrics-container="true"]')
+							document.querySelector(
+								// Regular lyrics
+								'[data-lyrics-container="true"],' +
+								// Lyrics for this song have yet to be released
+								'[class^="LyricsPlaceholder__Container-"]'
+							)
 						),
 						contributorsCreditStyle = getComputedStyle(
 							document.querySelector('[class^="ContributorsCreditSong__Label"]')
