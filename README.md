@@ -1,5 +1,6 @@
 # Song Lyrics
 
+[![Chrome Web Store Version](https://img.shields.io/chrome-web-store/v/fnfipngolkdmolfocahlgjoipplhbmha?style=flat-square)](https://chromewebstore.google.com/detail/song-lyrics/fnfipngolkdmolfocahlgjoipplhbmha)
 [![Cirrus CI - Base Branch Build Status](https://img.shields.io/cirrus/github/AlexWayfer/song-lyrics?style=flat-square)](https://cirrus-ci.com/github/AlexWayfer/song-lyrics)
 [![Depfu](https://img.shields.io/depfu/AlexWayfer/song-lyrics?style=flat-square)](https://depfu.com/repos/github/AlexWayfer/song-lyrics)
 
