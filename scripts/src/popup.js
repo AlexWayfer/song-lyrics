@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		}
 
 		const
-			searchURL = `https://genius.com/api/search?q=${query}`,
+			searchURL = `https://genius.com/api/search?q=${encodeURIComponent(query)}`,
 			searchResponse = await fetch(searchURL)
 
 		if (searchResponse.ok) {
