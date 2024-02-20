@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				}
 
 				//// Remove additional notes from song title
-				query = query.replace(/\((?:\w+ )*Video\)/i, '').replace(featuringRegexp, '')
+				query = query.replace(/\((?:(?:\w+ )*Video|Lyrics)\)/i, '').replace(featuringRegexp, '')
 
 				console.debug('query = ', query)
 
