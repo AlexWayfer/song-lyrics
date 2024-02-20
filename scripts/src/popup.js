@@ -102,21 +102,34 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		loadForm.classList.remove('hidden')
 	}
 
+	const loadCache = async () => {
+		const
+			cache = (await chrome.storage.local.get({ cache: {} })).cache,
+			cacheTTL = 24 * 60 * 60 * 1000 //// 24 hours
+
+		for (const key in cache) {
+			//// https://bugs.chromium.org/p/chromium/issues/detail?id=1472588
+			if (new Date(new Date(cache[key].createdAt).getTime() + cacheTTL) < new Date()) {
+				delete cache[key]
+			}
+		}
+
+		return cache
+	}
+
 	const loadLyrics = async query => {
 		query = query.trim()
 
 		queryInput.value = query
 
 		const
-			cache = (await chrome.storage.local.get({ cache: {} })).cache,
-			cached = cache[query],
-			cacheTTL = 24 * 60 * 60 * 1000 //// 24 hours
+			cache = await loadCache(),
+			cached = cache[query]
 
 		console.debug('cache = ', cache)
 		console.debug('cached = ', cached)
 
-		//// https://bugs.chromium.org/p/chromium/issues/detail?id=1472588
-		if (cached && new Date(new Date(cached.createdAt).getTime() + cacheTTL) > new Date()) {
+		if (cached) {
 			return displayLyrics(cached.songData, cached.lyricsHTML)
 		}
 
