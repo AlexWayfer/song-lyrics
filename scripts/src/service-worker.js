@@ -9,6 +9,8 @@ chrome.contextMenus.onClicked.addListener(info => {
 })
 
 chrome.runtime.onInstalled.addListener(async _details => {
+	chrome.storage.local.remove('cache')
+
 	chrome.contextMenus.create({
 		title: 'Clear lyrics cache',
 		contexts: ['action'],
