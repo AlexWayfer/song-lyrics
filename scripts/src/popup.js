@@ -38,13 +38,6 @@ document.addEventListener('DOMContentLoaded', async _event => {
 	}
 
 	const displayLyrics = (songData, lyricsHTML) => {
-		const
-			parser = new DOMParser(),
-			lyricsDocument = parser.parseFromString(lyricsHTML, 'text/html')
-
-		// console.debug(lyricsDocument)
-		// console.debug(lyricsDocument.querySelectorAll('[class^="LyricsPlaceholder__Message"]'))
-
 		lyricsContainer.querySelector('.title').innerText = songData.full_title
 		lyricsContainer.querySelector('.link').href = songData.url
 
@@ -61,6 +54,42 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		} else {
 			songArtImage.classList.add('hidden')
 		}
+
+		//// Fill with lyrics
+		lyricsContainer.querySelector('.text').innerHTML = lyricsHTML
+
+		//// Display elements
+		loadingNotice.classList.add('hidden')
+		captchaNotice.classList.add('hidden')
+		notFoundNotice.classList.add('hidden')
+		notSupportedNotice.classList.add('hidden')
+
+		lyricsContainer.classList.remove('hidden')
+		loadForm.classList.remove('hidden')
+	}
+
+	const loadCache = async () => {
+		const
+			cache = (await chrome.storage.local.get({ cache: {} })).cache,
+			cacheTTL = 24 * 60 * 60 * 1000 //// 24 hours
+
+		for (const key in cache) {
+			//// https://bugs.chromium.org/p/chromium/issues/detail?id=1472588
+			if (new Date(new Date(cache[key].createdAt).getTime() + cacheTTL) < new Date()) {
+				delete cache[key]
+			}
+		}
+
+		return cache
+	}
+
+	const parseLyricsPage = lyricsPage => {
+		const
+			parser = new DOMParser(),
+			lyricsDocument = parser.parseFromString(lyricsPage, 'text/html')
+
+		// console.debug(lyricsDocument)
+		// console.debug(lyricsDocument.querySelectorAll('[class^="LyricsPlaceholder__Message"]'))
 
 		let
 			lyricsElements = Array.from(lyricsDocument.querySelectorAll('[data-lyrics-container="true"]'))
@@ -89,32 +118,11 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				lyricsElements.reduce((acc, val) => [].concat(acc, document.createElement('br'), val))
 		}
 
-		//// Fill with lyrics
-		lyricsContainer.querySelector('.text').replaceChildren(...lyricsElements)
+		const lyricsHTML = lyricsElements.reduce((acc, val) => `${acc}${val.outerHTML}`, '')
 
-		//// Display elements
-		loadingNotice.classList.add('hidden')
-		captchaNotice.classList.add('hidden')
-		notFoundNotice.classList.add('hidden')
-		notSupportedNotice.classList.add('hidden')
+		// console.debug('lyricsHTML = ', lyricsHTML)
 
-		lyricsContainer.classList.remove('hidden')
-		loadForm.classList.remove('hidden')
-	}
-
-	const loadCache = async () => {
-		const
-			cache = (await chrome.storage.local.get({ cache: {} })).cache,
-			cacheTTL = 24 * 60 * 60 * 1000 //// 24 hours
-
-		for (const key in cache) {
-			//// https://bugs.chromium.org/p/chromium/issues/detail?id=1472588
-			if (new Date(new Date(cache[key].createdAt).getTime() + cacheTTL) < new Date()) {
-				delete cache[key]
-			}
-		}
-
-		return cache
+		return lyricsHTML
 	}
 
 	const loadLyrics = async query => {
@@ -145,14 +153,15 @@ document.addEventListener('DOMContentLoaded', async _event => {
 					songData =
 						(await (await fetch(`https://genius.com/api/songs/${firstHit.result.id}`)).json())
 							.response.song,
-					lyricsPage = await (await fetch(songData.description_annotation.url)).text()
+					lyricsPage = await (await fetch(songData.description_annotation.url)).text(),
+					lyricsHTML = parseLyricsPage(lyricsPage)
 
 				//// Write to cache
 				//// https://bugs.chromium.org/p/chromium/issues/detail?id=1472588
-				cache[query] = { songData, lyricsHTML: lyricsPage, createdAt: (new Date()).toString() }
+				cache[query] = { songData, lyricsHTML, createdAt: (new Date()).toString() }
 				chrome.storage.local.set({ cache })
 
-				displayLyrics(songData, lyricsPage)
+				displayLyrics(songData, lyricsHTML)
 			} else {
 				loadingNotice.classList.add('hidden')
 				captchaNotice.classList.add('hidden')
