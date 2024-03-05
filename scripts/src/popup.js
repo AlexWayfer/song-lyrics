@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		loadForm.classList.remove('hidden')
 		loadingNotice.classList.remove('hidden')
 
-		loadLyrics(queryInput.value)
+		searchLyrics(queryInput.value)
 	})
 
 	const setColors = colors => {
@@ -68,19 +68,43 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		loadForm.classList.remove('hidden')
 	}
 
-	const loadCache = async () => {
+	const getCache = async () => {
+		return (await chrome.storage.local.get({ cache: { searches: {}, songs: {} } })).cache
+	}
+
+	const readCache = async type => {
 		const
-			cache = (await chrome.storage.local.get({ cache: {} })).cache,
+			cache = await getCache(),
+			cachedType = cache[type],
 			cacheTTL = 24 * 60 * 60 * 1000 //// 24 hours
 
-		for (const key in cache) {
+		for (const key in cachedType) {
 			//// https://bugs.chromium.org/p/chromium/issues/detail?id=1472588
-			if (new Date(new Date(cache[key].createdAt).getTime() + cacheTTL) < new Date()) {
-				delete cache[key]
+			if (new Date(new Date(cachedType[key].createdAt).getTime() + cacheTTL) < new Date()) {
+				delete cachedType[key]
 			}
 		}
 
-		return cache
+		chrome.storage.local.set({ cache })
+
+		return cachedType
+	}
+
+	const writeCache = async (type, key, value) => {
+		const cache = await getCache()
+
+		// console.debug('cache = ', cache)
+		// console.debug('type = ', type)
+		// console.debug('cache[type] = ', cache[type])
+		// console.debug('key = ', key)
+		// console.debug('cache[type][key] = ', cache[type][key])
+		// console.debug('value = ', value)
+
+		//// Write to cache
+		//// https://bugs.chromium.org/p/chromium/issues/detail?id=1472588
+		cache[type][key] = { ...value, createdAt: (new Date()).toString() }
+
+		chrome.storage.local.set({ cache })
 	}
 
 	const parseLyricsPage = lyricsPage => {
@@ -125,20 +149,58 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		return lyricsHTML
 	}
 
-	const loadLyrics = async query => {
+	const loadLyrics = async songId => {
+		const
+			songsCache = await readCache('songs'),
+			cachedSong = songsCache[songId]
+
+		// console.debug('songsCache = ', songsCache)
+		// console.debug('cachedSong = ', cachedSong)
+
+		if (cachedSong) {
+			return displayLyrics(cachedSong.data, cachedSong.lyricsHTML)
+		}
+
+		const
+			songData =
+				(await (await fetch(`https://genius.com/api/songs/${songId}`)).json())
+					.response.song,
+			lyricsPage = await (await fetch(songData.description_annotation.url)).text(),
+			lyricsHTML = parseLyricsPage(lyricsPage)
+
+		await writeCache('songs', songId, { data: songData, lyricsHTML })
+
+		displayLyrics(songData, lyricsHTML)
+	}
+
+	const displaySearchResults = async songHits => {
+		if (songHits.length > 0) {
+			loadLyrics(songHits[0].result.id)
+		} else {
+			loadingNotice.classList.add('hidden')
+			captchaNotice.classList.add('hidden')
+			lyricsContainer.classList.add('hidden')
+			notSupportedNotice.classList.add('hidden')
+
+			notFoundNotice.classList.remove('hidden')
+			loadForm.classList.remove('hidden')
+		}
+	}
+
+	const searchLyrics = async query => {
 		query = query.trim()
 
 		queryInput.value = query
 
 		const
-			cache = await loadCache(),
-			cached = cache[query]
+			searchesCache = await readCache('searches'),
+			cachedSearch = searchesCache[query]
 
-		console.debug('cache = ', cache)
-		console.debug('cached = ', cached)
+		// console.debug('searchesCache = ', searchesCache)
+		// console.debug('cachedSearch = ', cachedSearch)
 
-		if (cached) {
-			return displayLyrics(cached.songData, cached.lyricsHTML)
+		if (cachedSearch) {
+			return displaySearchResults(cachedSearch.songHits)
 		}
 
 		const
@@ -146,31 +208,11 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			searchResponse = await fetch(searchURL)
 
 		if (searchResponse.ok) {
-			const firstHit = (await searchResponse.json()).response.hits[0]
+			const songHits = (await searchResponse.json()).response.hits.filter(hit => hit.type == 'song')
 
-			if (firstHit && firstHit.type == 'song') {
-				const
-					songData =
-						(await (await fetch(`https://genius.com/api/songs/${firstHit.result.id}`)).json())
-							.response.song,
-					lyricsPage = await (await fetch(songData.description_annotation.url)).text(),
-					lyricsHTML = parseLyricsPage(lyricsPage)
+			await writeCache('searches', query, { songHits })
 
-				//// Write to cache
-				//// https://bugs.chromium.org/p/chromium/issues/detail?id=1472588
-				cache[query] = { songData, lyricsHTML, createdAt: (new Date()).toString() }
-				chrome.storage.local.set({ cache })
-
-				displayLyrics(songData, lyricsHTML)
-			} else {
-				loadingNotice.classList.add('hidden')
-				captchaNotice.classList.add('hidden')
-				lyricsContainer.classList.add('hidden')
-				notSupportedNotice.classList.add('hidden')
-
-				notFoundNotice.classList.remove('hidden')
-				loadForm.classList.remove('hidden')
-			}
+			displaySearchResults(songHits)
 		} else {
 			const searchResponseText = await searchResponse.text()
 
@@ -195,7 +237,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			//
 			// problemWindow.addEventListener('beforeunload', event => {
 			// 	console.debug('problemWindow before unload', event)
-			// 	loadLyrics(query)
+			// 	searchLyrics(query)
 			// })
 		}
 	}
@@ -243,7 +285,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 				setColors(colors)
 
-				loadLyrics(query)
+				searchLyrics(query)
 			})
 
 			break
@@ -288,7 +330,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 				setColors(colors)
 
-				loadLyrics(query)
+				searchLyrics(query)
 			})
 
 			break
@@ -339,7 +381,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 				setColors(colors)
 
-				loadLyrics(`${songTitle} ${songArtist}`)
+				searchLyrics(`${songTitle} ${songArtist}`)
 			})
 
 			break
@@ -369,7 +411,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 				setColors(colors)
 
-				loadLyrics(`${songTitle} ${songArtist}`)
+				searchLyrics(`${songTitle} ${songArtist}`)
 			})
 
 			break
