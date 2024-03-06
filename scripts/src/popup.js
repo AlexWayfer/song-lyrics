@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		loadingNotice = document.querySelector('body > .loading'),
 		captchaNotice = document.querySelector('body > .captcha'),
 		lyricsContainer = document.querySelector('body > .lyrics'),
+		otherSearchResultsLink = lyricsContainer.querySelector('.other-search-results'),
 		notFoundNotice = document.querySelector('body > .not-found'),
 		notSupportedNotice = document.querySelector('body > .not-supported'),
 		otherSearchResultsContainer = document.querySelector('body > .other-search-results'),
@@ -213,8 +214,11 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				otherSearchResultsList.replaceChildren(...otherSearchResultsElements)
 
 				otherSearchResultsContainer.classList.remove('hidden')
+
+				otherSearchResultsLink.classList.remove('hidden')
 			} else {
 				otherSearchResultsContainer.classList.add('hidden')
+				otherSearchResultsLink.classList.add('hidden')
 			}
 		} else {
 			loadingNotice.classList.add('hidden')
