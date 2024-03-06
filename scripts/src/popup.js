@@ -467,6 +467,34 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			})
 
 			break
+		case 'song.link':
+			chrome.scripting.executeScript({
+				target: { tabId: currentTab.id },
+				func: () => ({
+					songTitle: document.querySelector('.e12n0mv61').innerText,
+					songArtist: document.querySelector('.e12n0mv60').innerText,
+					colors: {
+						background: getComputedStyle(document.querySelector('.css-1lcypyy')).backgroundColor,
+						text: getComputedStyle(document.querySelector('.css-1lcypyy')).color,
+						link: getComputedStyle(document.querySelector('.css-12zt9a8')).color,
+						border: getComputedStyle(document.querySelector('.css-1lcypyy')).borderColor
+					}
+				})
+			}, injectionResult => {
+				// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				let { songTitle, songArtist, colors } = injectionResult[0].result
+
+				console.debug('songTitle = ', songTitle)
+				console.debug('songArtist = ', songArtist)
+
+				songTitle = songTitle.replace(featuringRegexp, '')
+
+				setColors(colors)
+
+				searchLyrics(`${songTitle} ${songArtist}`)
+			})
+
+			break
 		default:
 			loadingNotice.classList.add('hidden')
 			lyricsContainer.classList.add('hidden')
