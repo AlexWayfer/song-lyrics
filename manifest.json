@@ -29,6 +29,7 @@
 		"storage"
 	],
 	"host_permissions": [
-		"https://*.genius.com/*"
+		"https://*.genius.com/*",
+		"https://*.rapgenius.com/*"
 	]
 }
