@@ -1,3 +1,8 @@
+html {
+	min-width: 300px;
+	height: 100px;
+}
+
 body {
 	--body-padding: 10px;
 
