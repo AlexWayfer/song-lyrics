@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 	const
 		loadingNotice = document.querySelector('body > .loading'),
+		loadingQueryText = loadingNotice.querySelector('.query'),
 		captchaNotice = document.querySelector('body > .captcha'),
 		lyricsContainer = document.querySelector('body > .lyrics'),
 		otherSearchResultsLink = lyricsContainer.querySelector('.other-search-results'),
@@ -205,6 +206,8 @@ document.addEventListener('DOMContentLoaded', async _event => {
 						otherSearchResultsList.querySelector('li.hidden').classList.remove('hidden')
 						otherSearchElement.classList.add('hidden')
 
+						loadingQueryText.innerText = songHit.result.full_title
+
 						await loadLyrics(songHit.result.id)
 					})
 
@@ -236,6 +239,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		query = query.trim()
 
 		queryInput.value = query
+		loadingQueryText.innerText = query
 
 		const
 			searchesCache = await readCache('searches'),
