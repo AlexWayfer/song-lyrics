@@ -74,12 +74,56 @@ body {
 				.link {
 					font-size: 0.9em;
 				}
+
+				p.other-search-results {
+					margin: 1em 0 0;
+				}
 			}
 		}
 
 		.text {
 			margin-top: 1em;
 			line-height: 1.6em;
+		}
+	}
+
+	& > .other-search-results {
+		& h4 {
+			margin: 1em 0;
+		}
+
+		& ul {
+			padding: 0 0.4em;
+			margin: 0;
+
+			& li {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				margin: 0.8em 0;
+
+				&:first-of-type {
+					margin-top: 0;
+				}
+
+				&:last-of-type {
+					margin-bottom: 0;
+				}
+
+				& img.song-art {
+					width: 40px;
+					margin-right: 0.6em;
+				}
+
+				& > .titles {
+					display: flex;
+					flex-direction: column;
+
+					& .artist {
+						font-size: 0.85em;
+					}
+				}
+			}
 		}
 	}
 

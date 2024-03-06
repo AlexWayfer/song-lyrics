@@ -8,12 +8,15 @@ document.addEventListener('DOMContentLoaded', async _event => {
 	document.body.classList.add(`${currentSettings.theme}-theme`)
 
 	const
-		loadingNotice = document.querySelector('.loading'),
-		captchaNotice = document.querySelector('.captcha'),
-		lyricsContainer = document.querySelector('.lyrics'),
-		notFoundNotice = document.querySelector('.not-found'),
-		notSupportedNotice = document.querySelector('.not-supported'),
-		loadForm = document.querySelector('form.load'),
+		loadingNotice = document.querySelector('body > .loading'),
+		captchaNotice = document.querySelector('body > .captcha'),
+		lyricsContainer = document.querySelector('body > .lyrics'),
+		notFoundNotice = document.querySelector('body > .not-found'),
+		notSupportedNotice = document.querySelector('body > .not-supported'),
+		otherSearchResultsContainer = document.querySelector('body > .other-search-results'),
+		otherSearchResultsList = otherSearchResultsContainer.querySelector('ul'),
+		otherSearchResultTemplate = otherSearchResultsList.querySelector('template'),
+		loadForm = document.querySelector('body > form.load'),
 		queryInput = loadForm.querySelector('input[name="query"]')
 
 	loadForm.addEventListener('submit', event => {
@@ -23,6 +26,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		notFoundNotice.classList.add('hidden')
 		notSupportedNotice.classList.add('hidden')
 		lyricsContainer.classList.add('hidden')
+		otherSearchResultsContainer.classList.add('hidden')
 
 		loadForm.classList.remove('hidden')
 		loadingNotice.classList.remove('hidden')
@@ -65,6 +69,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		notSupportedNotice.classList.add('hidden')
 
 		lyricsContainer.classList.remove('hidden')
+		otherSearchResultsContainer.classList.remove('hidden')
 		loadForm.classList.remove('hidden')
 	}
 
@@ -175,11 +180,32 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 	const displaySearchResults = async songHits => {
 		if (songHits.length > 0) {
-			loadLyrics(songHits[0].result.id)
+			await loadLyrics(songHits[0].result.id)
+
+			if (songHits.length > 1) {
+				const otherSearchResultsElements = songHits.slice(1, 5).map(songHit => {
+					const otherSearchElement =
+						otherSearchResultTemplate.content.firstElementChild.cloneNode(true)
+
+					otherSearchElement.querySelector('.title').innerText = songHit.result.title
+					otherSearchElement.querySelector('.artist').innerText = songHit.result.artist_names
+					otherSearchElement.querySelector('img.song-art').src =
+						songHit.result.song_art_image_thumbnail_url
+
+					return otherSearchElement
+				})
+
+				otherSearchResultsList.replaceChildren(...otherSearchResultsElements)
+
+				otherSearchResultsContainer.classList.remove('hidden')
+			} else {
+				otherSearchResultsContainer.classList.add('hidden')
+			}
 		} else {
 			loadingNotice.classList.add('hidden')
 			captchaNotice.classList.add('hidden')
 			lyricsContainer.classList.add('hidden')
+			otherSearchResultsContainer.classList.add('hidden')
 			notSupportedNotice.classList.add('hidden')
 
 			notFoundNotice.classList.remove('hidden')
@@ -418,6 +444,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		default:
 			loadingNotice.classList.add('hidden')
 			lyricsContainer.classList.add('hidden')
+			otherSearchResultsContainer.classList.add('hidden')
 			notFoundNotice.classList.add('hidden')
 			loadForm.classList.add('hidden')
 

@@ -14,6 +14,9 @@
 		<div class="right-part">
 			<h3 class="title"></h3>
 			<a class="link" target="_blank">Lyrics page</a>
+			<p class="other-search-results">
+				<a class="link" href="#other-search-results">Other search results</a>
+			</p>
 		</div>
 	</div>
 
@@ -21,6 +24,22 @@
 </div>
 
 <div class="not-found hidden">Song not found</div>
+
+<div class="other-search-results hidden">
+	<h4 id="other-search-results">Other search results</h4>
+
+	<ul>
+		<template>
+			<li>
+				<img class="song-art" />
+				<div class="titles">
+					<span class="title"></span>
+					<span class="artist"></span>
+				</div>
+			</li>
+		</template>
+	</ul>
+</div>
 
 <form class="load hidden">
 	<fieldset>
