@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 	const
 		currentTab = (await chrome.tabs.query({ active: true, currentWindow: true }))[0],
 		currentTabHostname = (new URL(currentTab.url)).hostname,
-		featuringRegexp = / \(?f(ea)?t\.? .+\)?/
+		featuringRegexp = / \(?f(ea)?t\.? [^()]+\)?/
 
 	switch (currentTabHostname) {
 		case 'deezer.com':
