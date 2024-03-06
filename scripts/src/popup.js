@@ -155,6 +155,8 @@ document.addEventListener('DOMContentLoaded', async _event => {
 	}
 
 	const loadLyrics = async songId => {
+		loadingNotice.classList.remove('hidden')
+
 		const
 			songsCache = await readCache('songs'),
 			cachedSong = songsCache[songId]
@@ -183,14 +185,27 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			await loadLyrics(songHits[0].result.id)
 
 			if (songHits.length > 1) {
-				const otherSearchResultsElements = songHits.slice(1, 5).map(songHit => {
+				const otherSearchResultsElements = songHits.slice(0, 5).map((songHit, index) => {
 					const otherSearchElement =
 						otherSearchResultTemplate.content.firstElementChild.cloneNode(true)
+
+					if (index == 0) otherSearchElement.classList.add('hidden')
 
 					otherSearchElement.querySelector('.title').innerText = songHit.result.title
 					otherSearchElement.querySelector('.artist').innerText = songHit.result.artist_names
 					otherSearchElement.querySelector('img.song-art').src =
 						songHit.result.song_art_image_thumbnail_url
+
+					otherSearchElement.addEventListener('click', async _event => {
+						lyricsContainer.classList.add('hidden')
+						otherSearchResultsContainer.classList.add('hidden')
+						loadForm.classList.add('hidden')
+
+						otherSearchResultsList.querySelector('li.hidden').classList.remove('hidden')
+						otherSearchElement.classList.add('hidden')
+
+						await loadLyrics(songHit.result.id)
+					})
 
 					return otherSearchElement
 				})

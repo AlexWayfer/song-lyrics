@@ -101,6 +101,7 @@ body {
 				flex-direction: row;
 				align-items: center;
 				margin: 0.8em 0;
+				cursor: default;
 
 				&:first-of-type {
 					margin-top: 0;
