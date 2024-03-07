@@ -338,6 +338,44 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			})
 
 			break
+		case 'music.yandex.ru':
+			chrome.scripting.executeScript({
+				target: { tabId: currentTab.id },
+				func: () => {
+					const
+						decoPaneStyle = getComputedStyle(document.querySelector('.deco-pane')),
+						playerControls = document.querySelector('.player-controls__track-container')
+
+					return {
+						songTitle: playerControls.querySelector('.track__title').innerText,
+						songArtists: playerControls.querySelector('.track__artists').innerText,
+						colors: {
+							background: decoPaneStyle.backgroundColor,
+							text: decoPaneStyle.color,
+							link: getComputedStyle(document.querySelector('.deco-link_muted')).color,
+							border: decoPaneStyle.borderColor
+						}
+					}
+				}
+			}, injectionResult => {
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				let
+					{ songTitle, songArtists, colors } = injectionResult[0].result
+
+				console.debug('songTitle = ', songTitle)
+				console.debug('songArtists = ', songArtists)
+
+				songTitle = songTitle.replace(featuringRegexp, '')
+
+				const query = `${songTitle} ${songArtists}`
+				console.debug('query = ', query)
+
+				setColors(colors)
+
+				searchLyrics(query)
+			})
+
+			break
 		case 'youtube.com':
 		case 'www.youtube.com':
 			chrome.scripting.executeScript({
