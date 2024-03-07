@@ -376,6 +376,50 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			})
 
 			break
+		case 'soundcloud.com':
+			chrome.scripting.executeScript({
+				target: { tabId: currentTab.id },
+				func: () => {
+					const
+						playbackTitleContainer =
+							document.querySelector('.playbackSoundBadge__titleContextContainer')
+
+					return {
+						songTitle:
+							playbackTitleContainer
+								.querySelector('.playbackSoundBadge__title > a > span:not(.sc-visuallyhidden)')
+								.innerText,
+						songArtists:
+							playbackTitleContainer
+								.querySelector(':scope > a')
+								.innerText,
+						colors: {
+							background: getComputedStyle(document.querySelector('body')).backgroundColor,
+							text: getComputedStyle(document.querySelector('.sc-text')).color,
+							link: getComputedStyle(document.querySelector('.playButton')).backgroundColor,
+							border: getComputedStyle(document.querySelector('.sc-border-light-top')).borderColor
+						}
+					}
+				}
+			}, injectionResult => {
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				let
+					{ songTitle, songArtists, colors } = injectionResult[0].result
+
+				console.debug('songTitle = ', songTitle)
+				console.debug('songArtists = ', songArtists)
+
+				songTitle = songTitle.replace(featuringRegexp, '')
+
+				const query = `${songTitle} ${songArtists}`
+				console.debug('query = ', query)
+
+				setColors(colors)
+
+				searchLyrics(query)
+			})
+
+			break
 		case 'youtube.com':
 		case 'www.youtube.com':
 			chrome.scripting.executeScript({
