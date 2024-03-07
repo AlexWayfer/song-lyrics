@@ -16,8 +16,11 @@ Supported music platforms:
 
 *   [Deezer](https://www.deezer.com/)
 *   [YouTube](https://www.youtube.com/) (with chapters)
+*   [SoundCloud](https://soundcloud.com/)
+*   [Yandex Music](https://music.yandex.ru/)
 *   [Shazam](https://www.shazam.com/)
 *   [Genius](https://genius.com/) (mainly for testing)
+*   [Odesli](https://odesli.co/)
 
 Supported sources:
 
