@@ -567,6 +567,49 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			})
 
 			break
+		case 'last.fm':
+		case 'www.last.fm':
+			chrome.scripting.executeScript({
+				target: { tabId: currentTab.id },
+				func: () => {
+					//// There is also a dynamic player at the top of a page (from YouTube or Spotify),
+					//// but we parse only track pages for now.
+					let header = document.querySelector('header')
+
+					return {
+						songTitle: header.querySelector('h1[itemprop="name"]').innerText,
+						songArtist: header.querySelector('[itemprop="byArtist"]').innerText,
+						colors: {
+							background:
+								getComputedStyle(document.querySelector('.page-content')).backgroundColor,
+							text:
+								getComputedStyle(document.querySelector('.page-content')).color,
+							link:
+								getComputedStyle(document.querySelector('.about-artist a')).color,
+							border:
+								getComputedStyle(
+									document.querySelector('.play-this-track-playlink'),
+									':after'
+								).borderBottomColor
+						}
+					}
+				}
+			}, injectionResult => {
+				// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				let { songTitle, songArtist, colors } = injectionResult[0].result
+
+				console.debug('songTitle = ', songTitle)
+				console.debug('songArtist = ', songArtist)
+
+				songTitle = songTitle.replace(featuringRegexp, '')
+				songArtist = songArtist.trim()
+
+				setColors(colors)
+
+				searchLyrics(`${songTitle} ${songArtist}`)
+			})
+
+			break
 		case 'song.link':
 			chrome.scripting.executeScript({
 				target: { tabId: currentTab.id },
