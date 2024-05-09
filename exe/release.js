@@ -1,18 +1,19 @@
-const fs = require('fs')
-const execSync = require('child_process').execSync
+import * as fs from 'fs'
+import { execSync } from 'child_process'
+import * as readline from 'node:readline'
 
-const common = require('./_common')
+import * as common from './_common.js'
 
 // console.debug(common.packageVersion)
 
-const readline = require('readline').createInterface({
+const readlineInterface = readline.createInterface({
 	input: process.stdin,
 	output: process.stdout
 })
 
 console.info(`The current version is ${common.packageVersion}.`)
 
-readline.question('What the new version? ', newVersion => {
+readlineInterface.question('What the new version? ', newVersion => {
 	console.info('Updating manifest.json...')
 
 	const newManifestRaw = common.manifestRaw.replace(
@@ -41,5 +42,5 @@ readline.question('What the new version? ', newVersion => {
 	console.info('Pushing tags...')
 	execSync('git push --tags')
 
-	readline.close()
+	readlineInterface.close()
 })

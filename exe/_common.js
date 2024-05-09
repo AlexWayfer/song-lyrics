@@ -1,10 +1,11 @@
-const fs = require('fs')
-const path = require('path')
+import * as fs from 'fs'
+import * as path from 'path'
+import { fileURLToPath } from 'url'
 
-exports.packageRoot = path.resolve(__dirname, '..')
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-exports.manifestPath = path.resolve(exports.packageRoot, 'manifest.json')
-exports.manifestRaw = fs.readFileSync(exports.manifestPath).toString()
-exports.manifest = JSON.parse(exports.manifestRaw)
-
-exports.packageVersion = exports.manifest.version
+export const packageRoot = path.resolve(__dirname, '..')
+export const manifestPath = path.resolve(packageRoot, 'manifest.json')
+export const manifestRaw = fs.readFileSync(manifestPath).toString()
+export const manifest = JSON.parse(manifestRaw)
+export const packageVersion = manifest.version
