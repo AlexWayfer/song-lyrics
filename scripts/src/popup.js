@@ -615,7 +615,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				func: () => {
 					//// There is also a dynamic player at the top of a page (from YouTube or Spotify),
 					//// but we parse only track pages for now.
-					let header = document.querySelector('header')
+					const header = document.querySelector('header')
 
 					return {
 						songTitle: header.querySelector('h1[itemprop="name"]').innerText,
