@@ -420,6 +420,50 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			})
 
 			break
+		case 'open.spotify.com':
+			chrome.scripting.executeScript({
+				target: { tabId: currentTab.id },
+				func: () => {
+					const
+						nowPlayingWidget = document.querySelector('[data-testid="now-playing-widget"]'),
+						documentStyle = getComputedStyle(document.body)
+
+					return {
+						songTitle:
+							nowPlayingWidget
+								.querySelector('[data-testid="context-item-link"]')
+								.innerText,
+						songArtists:
+							nowPlayingWidget
+								.querySelector('[data-testid="context-item-info-subtitles"]')
+								.innerText,
+						colors: {
+							background: documentStyle.getPropertyValue('--background-base'),
+							text: documentStyle.getPropertyValue('--text-base'),
+							link: documentStyle.getPropertyValue('--text-bright-accent'),
+							border: documentStyle.getPropertyValue('--decorative-subdued')
+						}
+					}
+				}
+			}, injectionResult => {
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				let
+					{ songTitle, songArtists, colors } = injectionResult[0].result
+
+				console.debug('songTitle = ', songTitle)
+				console.debug('songArtists = ', songArtists)
+
+				songTitle = songTitle.replace(featuringRegexp, '')
+
+				const query = `${songTitle} ${songArtists}`
+				console.debug('query = ', query)
+
+				setColors(colors)
+
+				searchLyrics(query)
+			})
+
+			break
 		case 'music.apple.com':
 			chrome.scripting.executeScript({
 				target: { tabId: currentTab.id },
