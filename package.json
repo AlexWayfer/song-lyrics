@@ -14,6 +14,7 @@
 		"globals": "^15.2.0",
 		"remark-cli": "^12.0.0",
 		"remark-gfm": "^4.0.0",
+		"remark-lint-list-item-indent": "^4.0.0",
 		"remark-preset-lint-recommended": "^7.0.0",
 		"rollup": "^4.9.6",
 		"rollup-plugin-multi-input": "^1.4.1",
