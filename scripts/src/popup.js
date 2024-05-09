@@ -457,7 +457,25 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				//// Remove additional notes from song title
 				query =
 					query
-						.replace(/\((?:(?:\w+ )*(?:Video(?: HD)?|Soundtrack)|From .*|Lyrics|OUT NOW)\)/i, '')
+						.replace(
+							new RegExp(
+								'(?:' +
+									'\\((?:' +
+										'(?:\\w+ )*(?:Video(?: HD)?|Soundtrack)|' +
+										'From [^)]*|' +
+										'Lyrics|' +
+										'OUT NOW|' +
+										'Single(?: \\d+)?|' +
+										'Премьера (?:клипа|песни|трека)[^)]*' +
+									')\\)|' +
+									'\\| (?:' +
+										'Реакция и разбор' +
+									')' +
+								')',
+								'i'
+							),
+							''
+						)
 						.replace(featuringRegexp, '')
 
 				console.debug('query = ', query)
