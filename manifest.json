@@ -2,7 +2,7 @@
 	"manifest_version": 3,
 	"name": "Song Lyrics",
 	"description": "Extension for displaying current song lyrics",
-	"version": "2.0",
+	"version": "3.0",
 	"action": {
 		"default_popup": "pages/popup.html"
 	},
