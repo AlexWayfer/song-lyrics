@@ -420,6 +420,47 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			})
 
 			break
+		case 'music.apple.com':
+			chrome.scripting.executeScript({
+				target: { tabId: currentTab.id },
+				func: () => {
+					const
+						playerBar = document.querySelector('.player-bar amp-lcd').shadowRoot,
+						documentStyle = getComputedStyle(document.documentElement)
+
+					return {
+						songTitle:
+							playerBar.querySelector('.lcd-meta__primary').innerText,
+						songArtists:
+							//// There is album title after `—` in a separate element
+							playerBar.querySelector('.lcd-meta__secondary').innerText.split('\n—\n')[0],
+						colors: {
+							background: documentStyle.getPropertyValue('--pageBG'),
+							text: documentStyle.getPropertyValue('--systemPrimary'),
+							link: documentStyle.getPropertyValue('--linkColor'),
+							border: documentStyle.getPropertyValue('--labelDivider')
+						}
+					}
+				}
+			}, injectionResult => {
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				let
+					{ songTitle, songArtists, colors } = injectionResult[0].result
+
+				console.debug('songTitle = ', songTitle)
+				console.debug('songArtists = ', songArtists)
+
+				songTitle = songTitle.replace(featuringRegexp, '')
+
+				const query = `${songTitle} ${songArtists}`
+				console.debug('query = ', query)
+
+				setColors(colors)
+
+				searchLyrics(query)
+			})
+
+			break
 		case 'youtube.com':
 		case 'www.youtube.com':
 			chrome.scripting.executeScript({
