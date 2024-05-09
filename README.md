@@ -14,10 +14,13 @@ Chrome Extension for displaying current song lyrics.
 
 Supported music platforms:
 
+*   [Spotify](https://open.spotify.com/)
+*   [Apple Music](https://music.apple.com/)
 *   [Deezer](https://www.deezer.com/)
 *   [YouTube](https://www.youtube.com/) (with chapters)
 *   [SoundCloud](https://soundcloud.com/)
 *   [Yandex Music](https://music.yandex.ru/)
+*   [Last.fm](https://www.last.fm/)
 *   [Shazam](https://www.shazam.com/)
 *   [Genius](https://genius.com/) (mainly for testing)
 *   [Odesli](https://odesli.co/)
