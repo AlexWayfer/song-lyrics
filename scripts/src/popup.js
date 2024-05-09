@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 		//// Write to cache
 		//// https://bugs.chromium.org/p/chromium/issues/detail?id=1472588
-		cache[type][key] = { ...value, createdAt: (new Date()).toString() }
+		cache[type][key] = { ...value, createdAt: new Date().toString() }
 
 		chrome.storage.local.set({ cache })
 	}
@@ -293,7 +293,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 	const
 		currentTab = (await chrome.tabs.query({ active: true, currentWindow: true }))[0],
-		currentTabHostname = (new URL(currentTab.url)).hostname,
+		currentTabHostname = new URL(currentTab.url).hostname,
 		featuringRegexp = / \(?(?:f(ea)?t|prod)\.? [^()]+\)?/
 
 	switch (currentTabHostname) {
