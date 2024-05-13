@@ -759,6 +759,13 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-theme' : 'light-theme'
 			)
 
+			let
+				issueTitle = `Please add support of \`${currentTabHostname}\` as a music platform`,
+				issueBody = "I think it's appropriate for this extension. Thank you."
+
+			notSupportedNotice.querySelector('a').href =
+				`https://github.com/AlexWayfer/song-lyrics/issues/new?title=${issueTitle}&body=${issueBody}`
+
 			notSupportedNotice.classList.remove('hidden')
 	}
 })
