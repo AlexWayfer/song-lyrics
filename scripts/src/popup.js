@@ -575,6 +575,47 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			})
 
 			break
+		case 'music.youtube.com':
+			chrome.scripting.executeScript({
+				target: { tabId: currentTab.id },
+				func: () => {
+					const
+						playerBar = document.querySelector('ytmusic-player-bar'),
+						documentStyle = getComputedStyle(document.documentElement)
+
+					return {
+						songTitle:
+							playerBar.querySelector('.title').innerText,
+						songArtists:
+							//// There is album title after ` • ` in a separate element, and then even a year
+							playerBar.querySelector('.subtitle').innerText.split('\n • \n')[0],
+						colors: {
+							background: getComputedStyle(document.querySelector('body')).backgroundColor,
+							text: documentStyle.getPropertyValue('--yt-spec-text-primary'),
+							link: documentStyle.getPropertyValue('--yt-spec-brand-link-text'),
+							border: getComputedStyle(document.querySelector('#divider')).borderTopColor
+						}
+					}
+				}
+			}, injectionResult => {
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				let
+					{ songTitle, songArtists, colors } = injectionResult[0].result
+
+				console.debug('songTitle = ', songTitle)
+				console.debug('songArtists = ', songArtists)
+
+				songTitle = songTitle.replace(featuringRegexp, '')
+
+				const query = `${songTitle} ${songArtists}`
+				console.debug('query = ', query)
+
+				setColors(colors)
+
+				searchLyrics(query)
+			})
+
+			break
 		case 'genius.com':
 		case 'www.genius.com':
 			chrome.scripting.executeScript({

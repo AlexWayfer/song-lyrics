@@ -18,6 +18,7 @@ Supported music platforms:
 *   [Apple Music](https://music.apple.com/)
 *   [Deezer](https://www.deezer.com/)
 *   [YouTube](https://www.youtube.com/) (with chapters)
+*   [YouTube Music](https://music.youtube.com/)
 *   [SoundCloud](https://soundcloud.com/)
 *   [Yandex Music](https://music.yandex.ru/)
 *   [Last.fm](https://www.last.fm/)
