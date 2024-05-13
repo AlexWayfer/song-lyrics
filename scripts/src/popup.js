@@ -305,7 +305,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 	switch (currentTabHostname) {
 		case 'deezer.com':
-		case 'www.deezer.com':
+		case 'www.deezer.com': {
 			chrome.scripting.executeScript({
 				target: { tabId: currentTab.id },
 				func: () => {
@@ -345,7 +345,9 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			})
 
 			break
-		case 'music.yandex.ru':
+		}
+
+		case 'music.yandex.ru': {
 			chrome.scripting.executeScript({
 				target: { tabId: currentTab.id },
 				func: () => {
@@ -383,7 +385,9 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			})
 
 			break
-		case 'soundcloud.com':
+		}
+
+		case 'soundcloud.com': {
 			chrome.scripting.executeScript({
 				target: { tabId: currentTab.id },
 				func: () => {
@@ -427,7 +431,9 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			})
 
 			break
-		case 'open.spotify.com':
+		}
+
+		case 'open.spotify.com': {
 			chrome.scripting.executeScript({
 				target: { tabId: currentTab.id },
 				func: () => {
@@ -471,7 +477,9 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			})
 
 			break
-		case 'music.apple.com':
+		}
+
+		case 'music.apple.com': {
 			chrome.scripting.executeScript({
 				target: { tabId: currentTab.id },
 				func: () => {
@@ -512,8 +520,10 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			})
 
 			break
+		}
+
 		case 'youtube.com':
-		case 'www.youtube.com':
+		case 'www.youtube.com': {
 			chrome.scripting.executeScript({
 				target: { tabId: currentTab.id },
 				func: () => {
@@ -575,7 +585,9 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			})
 
 			break
-		case 'music.youtube.com':
+		}
+
+		case 'music.youtube.com': {
 			chrome.scripting.executeScript({
 				target: { tabId: currentTab.id },
 				func: () => {
@@ -616,8 +628,10 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			})
 
 			break
+		}
+
 		case 'genius.com':
-		case 'www.genius.com':
+		case 'www.genius.com': {
 			chrome.scripting.executeScript({
 				target: { tabId: currentTab.id },
 				func: () => {
@@ -667,8 +681,10 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			})
 
 			break
+		}
+
 		case 'shazam.com':
-		case 'www.shazam.com':
+		case 'www.shazam.com': {
 			chrome.scripting.executeScript({
 				target: { tabId: currentTab.id },
 				func: () => {
@@ -716,8 +732,10 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			})
 
 			break
+		}
+
 		case 'last.fm':
-		case 'www.last.fm':
+		case 'www.last.fm': {
 			chrome.scripting.executeScript({
 				target: { tabId: currentTab.id },
 				func: () => {
@@ -759,7 +777,9 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			})
 
 			break
-		case 'song.link':
+		}
+
+		case 'song.link': {
 			chrome.scripting.executeScript({
 				target: { tabId: currentTab.id },
 				func: () => ({
@@ -787,7 +807,9 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			})
 
 			break
-		default:
+		}
+
+		default: {
 			loadingNotice.classList.add('hidden')
 			lyricsContainer.classList.add('hidden')
 			otherSearchResultsContainer.classList.add('hidden')
@@ -808,5 +830,6 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				`https://github.com/AlexWayfer/song-lyrics/issues/new?title=${issueTitle}&body=${issueBody}`
 
 			notSupportedNotice.classList.remove('hidden')
+		}
 	}
 })
