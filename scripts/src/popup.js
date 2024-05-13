@@ -626,16 +626,35 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		case 'www.shazam.com':
 			chrome.scripting.executeScript({
 				target: { tabId: currentTab.id },
-				func: () => ({
-					songTitle: document.querySelector('h1.title').innerText,
-					songArtist: document.querySelector('h2.artist').innerText,
-					colors: {
-						background: getComputedStyle(document.querySelector('body')).backgroundColor,
-						text: getComputedStyle(document.querySelector('h2.section-title')).color,
-						link: getComputedStyle(document.querySelector('.shz-text-btn')).backgroundColor,
-						border: getComputedStyle(document.querySelector('.shz-partial-tracklist')).borderColor
+				func: () => {
+					const header = document.querySelector('[class*=" TrackPageHeader_songDetail_"]')
+
+					return {
+						songTitle: header.querySelector('h1').innerText,
+						songArtist: header.querySelector('h2').innerText,
+						colors: {
+							background:
+								getComputedStyle(
+									document.querySelector('body')
+								).backgroundColor,
+							text:
+								getComputedStyle(
+									document.querySelector(
+										'[class^="pages_container__"] [class*="Text-module_text-black-100"]'
+									)
+								).color,
+							link:
+								getComputedStyle(
+									document.querySelector('[class^="FloatingShazamButton_buttonContainer__"] svg')
+								).fill,
+							border:
+								getComputedStyle(
+									document.querySelector('[class*="SongItem-module_container"]'),
+									':after'
+								).backgroundColor
+						}
 					}
-				})
+				}
 			}, injectionResult => {
 				// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
 				let { songTitle, songArtist, colors } = injectionResult[0].result
