@@ -534,21 +534,16 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			}, injectionResult => {
 				// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
 				let { videoTitle, channelName, chapterTitle, colors } = injectionResult[0].result
-				let query
+				let songTitile = chapterTitle || videoTitle
 
 				console.debug('videoTitle = ', videoTitle)
 				console.debug('channelName = ', channelName)
 				console.debug('chapterTitle = ', chapterTitle)
-
-				if (chapterTitle) {
-					query = chapterTitle.includes(' - ') ? chapterTitle : `${chapterTitle} ${channelName}`
-				} else {
-					query = videoTitle
-				}
+				console.debug('songTitile = ', songTitile)
 
 				//// Remove additional notes from song title
-				query =
-					query
+				songTitile =
+					songTitile
 						.replace(
 							new RegExp(
 								'(?:' +
@@ -569,6 +564,8 @@ document.addEventListener('DOMContentLoaded', async _event => {
 							''
 						)
 						.replace(featuringRegexp, '')
+
+				let query = songTitile.includes(' - ') ? songTitile : `${songTitile} ${channelName}`
 
 				console.debug('query = ', query)
 
