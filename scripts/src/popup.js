@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		otherSearchResultsContainer = document.querySelector('body > .other-search-results'),
 		otherSearchResultsList = otherSearchResultsContainer.querySelector('ul'),
 		otherSearchResultTemplate = otherSearchResultsList.querySelector('template'),
+		searchPageLink = document.querySelector('a.search-page'),
 		loadForm = document.querySelector('body > form.load'),
 		queryInput = loadForm.querySelector('input[name="query"]')
 
@@ -29,6 +30,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		notSupportedNotice.classList.add('hidden')
 		lyricsContainer.classList.add('hidden')
 		otherSearchResultsContainer.classList.add('hidden')
+		searchPageLink.classList.add('hidden')
 
 		loadForm.classList.remove('hidden')
 		loadingNotice.classList.remove('hidden')
@@ -233,13 +235,18 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			notFoundNotice.classList.remove('hidden')
 			loadForm.classList.remove('hidden')
 		}
+
+		searchPageLink.classList.remove('hidden')
 	}
 
 	const searchLyrics = async query => {
 		query = query.trim()
 
+		const encodedQuery = encodeURIComponent(query)
+
 		queryInput.value = query
 		loadingQueryText.innerText = query
+		searchPageLink.href = `https://genius.com/search?q=${encodedQuery.replace(/[()]/g, '')}`
 
 		const
 			searchesCache = await readCache('searches'),
@@ -253,7 +260,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		}
 
 		const
-			searchURL = `https://genius.com/api/search?q=${encodeURIComponent(query)}`,
+			searchURL = `https://genius.com/api/search?q=${encodedQuery}`,
 			searchResponse = await fetch(searchURL)
 
 		if (searchResponse.ok) {
@@ -747,6 +754,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			lyricsContainer.classList.add('hidden')
 			otherSearchResultsContainer.classList.add('hidden')
 			notFoundNotice.classList.add('hidden')
+			searchPageLink.classList.add('hidden')
 			loadForm.classList.add('hidden')
 
 			notSupportedNotice.classList.remove('hidden')
