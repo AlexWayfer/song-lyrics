@@ -754,6 +754,11 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			searchPageLink.classList.add('hidden')
 			loadForm.classList.add('hidden')
 
+			document.body.classList.remove('site-theme')
+			document.body.classList.add(
+				window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-theme' : 'light-theme'
+			)
+
 			notSupportedNotice.classList.remove('hidden')
 	}
 })
