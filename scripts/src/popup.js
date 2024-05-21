@@ -300,8 +300,11 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 	const
 		currentTab = (await chrome.tabs.query({ active: true, currentWindow: true }))[0],
-		currentTabHostname = new URL(currentTab.url).hostname,
-		featuringRegexp = / \(?(?:f(ea)?t|prod)\.? [^()]+\)?/
+		currentTabHostname = new URL(currentTab.url).hostname
+
+	const clearFeaturing = text => {
+		return text.replace(/ [([]?(?:f(ea)?t|prod)\.? [^()[\]]+[)\]]?/, ' ')
+	}
 
 	switch (currentTabHostname) {
 		case 'deezer.com':
@@ -332,7 +335,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				console.debug('songTitle = ', songTitle)
 				console.debug('songArtists = ', songArtists)
 
-				songTitle = songTitle.replace(featuringRegexp, '')
+				songTitle = clearFeaturing(songTitle)
 				//// Take only the first artist, second can be from the featuring
 				let songArtist = songArtists.split(', ', 2)[0]
 
@@ -374,7 +377,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				console.debug('songTitle = ', songTitle)
 				console.debug('songArtists = ', songArtists)
 
-				songTitle = songTitle.replace(featuringRegexp, '')
+				songTitle = clearFeaturing(songTitle)
 
 				const query = `${songTitle} ${songArtists}`
 				console.debug('query = ', query)
@@ -420,7 +423,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				console.debug('songTitle = ', songTitle)
 				console.debug('songArtists = ', songArtists)
 
-				songTitle = songTitle.replace(featuringRegexp, '')
+				songTitle = clearFeaturing(songTitle)
 
 				const query = `${songTitle} ${songArtists}`
 				console.debug('query = ', query)
@@ -466,7 +469,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				console.debug('songTitle = ', songTitle)
 				console.debug('songArtists = ', songArtists)
 
-				songTitle = songTitle.replace(featuringRegexp, '')
+				songTitle = clearFeaturing(songTitle)
 
 				const query = `${songTitle} ${songArtists}`
 				console.debug('query = ', query)
@@ -509,7 +512,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				console.debug('songTitle = ', songTitle)
 				console.debug('songArtists = ', songArtists)
 
-				songTitle = songTitle.replace(featuringRegexp, '')
+				songTitle = clearFeaturing(songTitle)
 
 				const query = `${songTitle} ${songArtists}`
 				console.debug('query = ', query)
@@ -552,28 +555,27 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				console.debug('songTitile = ', songTitile)
 
 				//// Remove additional notes from song title
-				songTitile =
-					songTitile
-						.replace(
-							new RegExp(
-								'(?:' +
-									'\\((?:' +
-										'(?:\\w+ )*(?:Video(?: HD)?|Soundtrack)|' +
-										'From [^)]*|' +
-										'Lyrics|' +
-										'OUT NOW|' +
-										'Single(?: \\d+)?|' +
-										'Премьера (?:клипа|песни|трека)[^)]*' +
-									')\\)|' +
-									'\\| (?:' +
-										'Реакция и разбор' +
-									')' +
-								')',
-								'i'
-							),
-							''
-						)
-						.replace(featuringRegexp, '')
+				songTitile = songTitile.replace(
+					new RegExp(
+						'(?:' +
+							'\\((?:' +
+								'(?:\\w+ )*(?:Video(?: HD)?|Soundtrack)|' +
+								'From [^)]*|' +
+								'Lyrics|' +
+								'OUT NOW|' +
+								'Single(?: \\d+)?|' +
+								'Премьера (?:клипа|песни|трека)[^)]*' +
+							')\\)|' +
+							'\\| (?:' +
+								'Реакция и разбор' +
+							')' +
+						')',
+						'i'
+					),
+					''
+				)
+
+				songTitile = clearFeaturing(songTitile)
 
 				let query = songTitile.includes(' - ') ? songTitile : `${songTitile} ${channelName}`
 
@@ -617,7 +619,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				console.debug('songTitle = ', songTitle)
 				console.debug('songArtists = ', songArtists)
 
-				songTitle = songTitle.replace(featuringRegexp, '')
+				songTitle = clearFeaturing(songTitle)
 
 				const query = `${songTitle} ${songArtists}`
 				console.debug('query = ', query)
@@ -723,7 +725,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				console.debug('songTitle = ', songTitle)
 				console.debug('songArtist = ', songArtist)
 
-				songTitle = songTitle.replace(featuringRegexp, '')
+				songTitle = clearFeaturing(songTitle)
 				songArtist = songArtist.trim()
 
 				setColors(colors)
@@ -768,7 +770,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				console.debug('songTitle = ', songTitle)
 				console.debug('songArtist = ', songArtist)
 
-				songTitle = songTitle.replace(featuringRegexp, '')
+				songTitle = clearFeaturing(songTitle)
 				songArtist = songArtist.trim()
 
 				setColors(colors)
@@ -799,7 +801,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				console.debug('songTitle = ', songTitle)
 				console.debug('songArtist = ', songArtist)
 
-				songTitle = songTitle.replace(featuringRegexp, '')
+				songTitle = clearFeaturing(songTitle)
 
 				setColors(colors)
 
