@@ -11,6 +11,7 @@
 		"@stylistic/stylelint-config": "^1.0.1",
 		"eslint": "^9.2.0",
 		"globals": "^15.2.0",
+		"npm-run-all": "^4.1.5",
 		"remark-cli": "^12.0.0",
 		"remark-gfm": "^4.0.0",
 		"remark-lint-list-item-indent": "^4.0.0",
@@ -26,11 +27,11 @@
 		"lint:docs": "remark -f .",
 		"lint:styles": "stylelint styles/",
 		"lint:scripts": "eslint",
-		"lint": "pnpm run lint:docs; docs_lint_result=$?; pnpm run lint:styles; styles_lint_result=$?; pnpm run lint:scripts && [ $styles_lint_result -eq 0 ] && [ $docs_lint_result -eq 0 ]",
+		"lint": "pnpm npm-run-all lint:*",
 		"build:scripts": "rollup -c",
 		"build": "pnpm run build:scripts",
 		"watch:scripts": "pnpm run build:scripts --watch",
-		"watch": "pnpm run watch:scripts",
+		"watch": "pnpm npm-run-all --parallel watch:*",
 		"pack": "node exe/pack.js",
 		"release": "node exe/release.js"
 	}
