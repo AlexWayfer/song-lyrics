@@ -78,7 +78,11 @@ document.addEventListener('DOMContentLoaded', async _event => {
 	}
 
 	const getCache = async () => {
-		return (await chrome.storage.local.get({ cache: { searches: {}, songs: {} } })).cache
+		const cache = (await chrome.storage.local.get({ cache: { searches: {}, songs: {} } })).cache
+
+		// console.debug('cache = ', cache)
+
+		return cache
 	}
 
 	const readCache = async type => {
@@ -174,9 +178,17 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 		const
 			songData =
-				(await (await fetch(`https://genius.com/api/songs/${songId}`)).json())
+				(
+					await (
+						await fetch(`https://genius.com/api/songs/${songId}`, { credentials: 'omit' })
+					).json()
+				)
 					.response.song,
-			lyricsPage = await (await fetch(songData.description_annotation.url)).text(),
+			lyricsPage =
+				await (
+					await fetch(songData.description_annotation.url, { credentials: 'omit' })
+				)
+					.text(),
 			lyricsHTML = parseLyricsPage(lyricsPage)
 
 		await writeCache('songs', songId, { data: songData, lyricsHTML })
@@ -261,7 +273,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 		const
 			searchURL = `https://genius.com/api/search?q=${encodedQuery}`,
-			searchResponse = await fetch(searchURL)
+			searchResponse = await fetch(searchURL, { credentials: 'omit' })
 
 		if (searchResponse.ok) {
 			const songHits = (await searchResponse.json()).response.hits.filter(hit => hit.type == 'song')

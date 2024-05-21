@@ -5,6 +5,7 @@
 *   Write usage instructions.
 *   Remove trash in square parentheses from YouTube requests.
 *   Add CHANGELOG.
+*   Fix warning about third-party cookies in extension errors.
 *   Use `npm-run-all` for development simplification.
 
 ## 3.1.0 (2024-05-14)
