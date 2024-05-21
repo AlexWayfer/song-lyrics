@@ -3,6 +3,7 @@
 ## Unreleased
 
 *   Write usage instructions.
+*   Remove trash in square parentheses from YouTube requests.
 *   Add CHANGELOG.
 *   Use `npm-run-all` for development simplification.
 

@@ -558,14 +558,14 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				songTitile = songTitile.replace(
 					new RegExp(
 						'(?:' +
-							'\\((?:' +
-								'(?:\\w+ )*(?:Video(?: HD)?|Soundtrack)|' +
+							'[([](?:' +
+								'(?:\\w+ )*(?:Video(?: (?:HD|- Official))?|Soundtrack)|' +
 								'From [^)]*|' +
 								'Lyrics|' +
 								'OUT NOW|' +
 								'Single(?: \\d+)?|' +
 								'Премьера (?:клипа|песни|трека)[^)]*' +
-							')\\)|' +
+							')[\\])]|' +
 							'\\| (?:' +
 								'Реакция и разбор' +
 							')' +
