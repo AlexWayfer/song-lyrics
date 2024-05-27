@@ -8,6 +8,10 @@ document.addEventListener('DOMContentLoaded', async _event => {
 	document.body.classList.add(`${currentSettings.theme}-theme`)
 
 	const
+		currentTab = (await chrome.tabs.query({ active: true, currentWindow: true }))[0],
+		currentTabHostname = new URL(currentTab.url).hostname
+
+	const
 		loadingNotice = document.querySelector('body > .loading'),
 		loadingQueryText = loadingNotice.querySelector('.query'),
 		captchaNotice = document.querySelector('body > .captcha'),
@@ -43,6 +47,9 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		document.documentElement.style.setProperty('--site-text-color', colors.text)
 		document.documentElement.style.setProperty('--site-link-color', colors.link)
 		document.documentElement.style.setProperty('--site-border-color', colors.border)
+
+		// console.debug('window.parent = ', window.parent)
+		window.parent.postMessage({ colors }, currentTab.url)
 	}
 
 	const displayLyrics = (songData, lyricsHTML) => {
@@ -309,10 +316,6 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			// })
 		}
 	}
-
-	const
-		currentTab = (await chrome.tabs.query({ active: true, currentWindow: true }))[0],
-		currentTabHostname = new URL(currentTab.url).hostname
 
 	const clearFeaturing = text => {
 		return text.replace(/ [([]?(?:f(ea)?t|prod)\.? [^()[\]]+[)\]]?/, ' ')

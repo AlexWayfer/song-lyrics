@@ -4,7 +4,7 @@
 	"description": "Extension for displaying current song lyrics",
 	"version": "3.1.0",
 	"action": {
-		"default_popup": "pages/popup.html"
+		"popup": "pages/popup.html"
 	},
 	"icons": {
 		"16": "images/icons/16.png",
@@ -31,5 +31,11 @@
 	"host_permissions": [
 		"https://*.genius.com/*",
 		"https://*.rapgenius.com/*"
+	],
+	"web_accessible_resources": [
+		{
+			"resources": ["pages/popup.html", "styles/popup.css", "scripts/compiled/popup.js"],
+			"matches": ["<all_urls>"]
+		}
 	]
 }
