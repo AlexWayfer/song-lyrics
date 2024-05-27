@@ -68,17 +68,16 @@ chrome.action.onClicked.addListener(async tab => {
 				// console.debug('containerHeader mouseup')
 
 				container.lastPosition = null
-
-				container.removeEventListener('mousemove', container.draggingEvent)
+				containerHeader.removeEventListener('mousemove', container.draggingEvent)
 			})
 
 			containerHeader.addEventListener('mouseout', event => {
 				// console.debug('containerHeader mouseout')
 
-				// container.lastPosition = null
-				container.draggingEvent(event)
+				// container.draggingEvent(event)
 
-				container.removeEventListener('mousemove', container.draggingEvent)
+				container.lastPosition = null
+				containerHeader.removeEventListener('mousemove', container.draggingEvent)
 			})
 
 			container.appendChild(containerHeader)
