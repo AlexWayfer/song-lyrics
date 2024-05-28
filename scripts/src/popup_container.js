@@ -55,7 +55,13 @@ window.PopupContainer = class {
 		`
 		element.draggingEvent = event => {
 			const
-				elementRect = element.getBoundingClientRect(),
+				elementRect = element.getBoundingClientRect()
+
+			// console.debug('elementRect.left = ', elementRect.left)
+			// console.debug('event.clientX = ', event.clientX)
+			// console.debug('element.lastPosition.left = ', element.lastPosition.left)
+
+			const
 				newLeft = elementRect.left + event.clientX - element.lastPosition.left,
 				newTop = elementRect.top + event.clientY - element.lastPosition.top
 
