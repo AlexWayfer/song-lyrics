@@ -1,5 +1,6 @@
 window.PopupContainer = class {
 	static #elementId = 'song-lyrics-container'
+	static #borderWidth = '3px'
 
 	constructor({ width = '500px' } = {}) {
 		this.element = document.getElementById(this.constructor.#elementId)
@@ -47,7 +48,7 @@ window.PopupContainer = class {
 			left: calc(100vw - ${width} - 50px);
 			width: ${width};
 			height: 600px;
-			border-width: 3px;
+			border-width: ${this.constructor.#borderWidth};
 			border-style: solid;
 			border-color: transparent;
 			user-select: none;
@@ -75,16 +76,58 @@ window.PopupContainer = class {
 	}
 
 	#headerConstructor() {
-		const header = document.createElement('h1')
-
-		header.innerText = 'Song Lyrics'
+		const header = document.createElement('div')
 
 		header.style = `
-			font-size: 16px;
-			font-weight: bold;
-			padding: 0.1em 0.4em 0.4em;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding:
+				calc(0.2em - ${this.constructor.#borderWidth}) 0.2em 0.2em 0.4em;
 			cursor: move;
 		`
+
+		const title = document.createElement('h1')
+
+		title.innerText = 'Song Lyrics'
+
+		title.style = `
+			font-size: 16px;
+			font-weight: bold;
+			padding-bottom: 0.2em;
+		`
+
+		header.appendChild(title)
+
+		const closeButton = document.createElement('button')
+
+		closeButton.style = `
+			line-height: 1em;
+			padding: 0.4em;
+		`
+
+		closeButton.addEventListener('click', _event => {
+			this.remove()
+		})
+
+		const closeIconSize = '18'
+
+		//// https://www.iconfinder.com/icons/293668/close_icon
+		closeButton.innerHTML = `
+			<svg
+				width="${closeIconSize}"
+				height="${closeIconSize}"
+				viewBox="0 0 32 32"
+				fill="currentColor"
+				style="vertical-align: middle;"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path d="M4 8 L8 4 L16 12 L24 4 L28 8 L20 16 L28 24 L24 28 L16 20 L8 28 L4 24 L12 16 z"/>
+			</svg>
+		`
+		// closeButton.appendChild(closeIcon)
+
+		header.appendChild(closeButton)
 
 		header.addEventListener('mousedown', event => {
 			this.element.lastPosition = { left: event.clientX, top: event.clientY }

@@ -35,7 +35,11 @@
 	],
 	"web_accessible_resources": [
 		{
-			"resources": ["pages/popup.html", "styles/popup.css", "scripts/compiled/popup.js"],
+			"resources": [
+				"pages/popup.html",
+				"styles/popup.css",
+				"scripts/compiled/popup.js"
+			],
 			"matches": ["<all_urls>"]
 		}
 	]
