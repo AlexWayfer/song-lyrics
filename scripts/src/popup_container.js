@@ -1,10 +1,8 @@
 window.PopupContainer = class {
 	static #elementId = 'song-lyrics-container'
 
-	constructor({ window, width = '500px' } = {}) {
-		this.window = window
-
-		this.element = this.window.document.getElementById(this.constructor.#elementId)
+	constructor({ width = '500px' } = {}) {
+		this.element = document.getElementById(this.constructor.#elementId)
 
 		if (this.element) {
 			this.alreadyExist = true
@@ -25,12 +23,12 @@ window.PopupContainer = class {
 	}
 
 	append() {
-		this.window.document.body.appendChild(this.element)
+		document.body.appendChild(this.element)
 	}
 
 	remove() {
 		this.element.remove()
-		this.window.removeEventListener('message', this.window.popupMessageListener)
+		window.removeEventListener('message', window.popupMessageListener)
 		return
 	}
 
@@ -122,7 +120,7 @@ window.PopupContainer = class {
 	}
 
 	#windowMessagesConstructor() {
-		this.window.popupMessageListener = event => {
+		window.popupMessageListener = event => {
 			// console.debug('message event = ', event)
 			// console.debug('chrome.runtime.id = ', chrome.runtime.id)
 
@@ -131,6 +129,6 @@ window.PopupContainer = class {
 			this.element.style.borderColor = event.data.colors.border
 			this.header.style.background = this.element.style.borderColor
 		}
-		this.window.addEventListener('message', this.window.popupMessageListener)
+		window.addEventListener('message', window.popupMessageListener)
 	}
 }

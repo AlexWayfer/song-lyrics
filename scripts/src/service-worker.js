@@ -16,7 +16,7 @@ chrome.action.onClicked.addListener(async tab => {
 				func: () => {
 					// console.debug('chrome.scripting PopupContainer = ', PopupContainer)
 
-					const popupContainer = new PopupContainer({ window })
+					const popupContainer = new window.PopupContainer()
 
 					if (popupContainer.alreadyExist) {
 						popupContainer.remove()

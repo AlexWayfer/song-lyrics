@@ -37,7 +37,11 @@ export default [
 			'@stylistic/js/multiline-comment-style': ['warn', 'separate-lines'],
 			'@stylistic/js/multiline-ternary': ['warn', 'never'],
 			'@stylistic/js/function-paren-newline': ['warn', 'multiline-arguments'],
-			'@stylistic/js/array-element-newline': ['warn', 'consistent']
+			'@stylistic/js/array-element-newline': ['warn', 'consistent'],
+			'@stylistic/js/space-before-function-paren': [
+				'error',
+				{ anonymous: 'always', named: 'never', asyncArrow: 'always' }
+			]
 		}
 	},
 	{
