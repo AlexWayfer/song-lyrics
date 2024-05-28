@@ -1,5 +1,6 @@
 window.PopupContainer = class {
 	static #elementId = 'song-lyrics-container'
+
 	static #borderWidth = '3px'
 
 	constructor({ width = '500px' } = {}) {
