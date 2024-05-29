@@ -3,7 +3,7 @@ window.PopupContainer = class {
 
 	static #borderWidth = '3px'
 
-	constructor({ width = '500px' } = {}) {
+	constructor() {
 		this.element = document.getElementById(this.constructor.#elementId)
 
 		if (this.element) {
@@ -13,15 +13,19 @@ window.PopupContainer = class {
 		} else {
 			this.alreadyExist = false
 
-			this.element = this.#elementConstructor(width)
-
-			this.header = this.#headerConstructor()
-			this.element.appendChild(this.header)
-
-			this.element.appendChild(this.#iframeConstructor())
-
-			this.#windowMessagesConstructor()
+			// You should call `asyncConstructor` method
 		}
+	}
+
+	async asyncConstructor() {
+		this.element = await this.#elementConstructor()
+
+		this.header = this.#headerConstructor()
+		this.element.appendChild(this.header)
+
+		this.element.appendChild(this.#iframeConstructor())
+
+		this.#windowMessagesConstructor()
 	}
 
 	append() {
@@ -34,10 +38,25 @@ window.PopupContainer = class {
 		return
 	}
 
-	#elementConstructor(width) {
+	get #settings() {
+		return (async () => (await chrome.storage.local.get({ popupSettings: {} })).popupSettings)()
+	}
+
+	set #settings(newValues) {
+		chrome.storage.local.set({ popupSettings: Object.assign(this.#settings, newValues) })
+	}
+
+	async #elementConstructor() {
 		const element = document.createElement('div')
 
 		element.id = this.constructor.#elementId
+
+		const
+			settings = await this.#settings,
+			width = `${settings.width || 500}px`,
+			height = `${(settings.height || 600)}px`
+
+		// console.debug('settings = ', settings)
 
 		element.style = `
 			display: flex;
@@ -48,13 +67,28 @@ window.PopupContainer = class {
 			top: 50px;
 			left: calc(100vw - ${width} - 50px);
 			width: ${width};
-			height: 600px;
+			height: ${height};
 			border-width: ${this.constructor.#borderWidth};
 			border-style: solid;
 			border-color: transparent;
 			user-select: none;
 			z-index: 999999999;
 		`
+
+		const resizeObserver = new ResizeObserver(entries => {
+			// console.debug('entries = ', entries)
+
+			const { width, height } = entries[0].contentRect
+
+			// console.debug('width = ', width)
+			// console.debug('height = ', height)
+
+			if (width == 0 && height == 0) return
+
+			this.#settings = { width, height }
+		})
+		resizeObserver.observe(element)
+
 		element.draggingEvent = event => {
 			const
 				elementRect = element.getBoundingClientRect()
