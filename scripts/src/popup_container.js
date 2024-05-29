@@ -96,16 +96,12 @@ window.PopupContainer = class {
 		resizeObserver.observe(element)
 
 		element.draggingEvent = event => {
-			const
-				elementRect = element.getBoundingClientRect()
-
-			// console.debug('elementRect.left = ', elementRect.left)
 			// console.debug('event.clientX = ', event.clientX)
 			// console.debug('element.lastPosition.left = ', element.lastPosition.left)
 
 			const
-				newLeft = elementRect.left + event.clientX - element.lastPosition.left,
-				newTop = elementRect.top + event.clientY - element.lastPosition.top
+				newLeft = element.offsetLeft + event.clientX - element.lastPosition.left,
+				newTop = element.offsetTop + event.clientY - element.lastPosition.top
 
 			element.style.left = `${newLeft}px`
 			element.style.top = `${newTop}px`
