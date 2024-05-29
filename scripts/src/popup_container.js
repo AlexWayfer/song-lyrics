@@ -78,14 +78,20 @@ window.PopupContainer = class {
 		const resizeObserver = new ResizeObserver(entries => {
 			// console.debug('entries = ', entries)
 
-			const { width, height } = entries[0].contentRect
+			if (this.resizeEvent) clearTimeout(this.resizeEvent)
 
-			// console.debug('width = ', width)
-			// console.debug('height = ', height)
+			this.resizeEvent = setTimeout(() => {
+				const { width, height } = entries[0].contentRect
 
-			if (width == 0 && height == 0) return
+				// console.debug('width = ', width)
+				// console.debug('height = ', height)
 
-			this.#settings = { width, height }
+				if (width == 0 && height == 0) return
+
+				// console.debug('rewrite sizes')
+
+				this.#settings = { width, height }
+			}, 200)
 		})
 		resizeObserver.observe(element)
 
