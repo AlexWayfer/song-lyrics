@@ -54,7 +54,7 @@ window.PopupContainer = class {
 		const
 			settings = await this.#settings,
 			width = `${settings.width || 500}px`,
-			height = `${(settings.height || 600)}px`
+			height = `${settings.height || 600}px`
 
 		// console.debug('settings = ', settings)
 
