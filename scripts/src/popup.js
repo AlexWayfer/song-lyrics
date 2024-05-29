@@ -26,6 +26,15 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		loadForm = document.querySelector('body > form.load'),
 		queryInput = loadForm.querySelector('input[name="query"]')
 
+	document.addEventListener('mousemove', event => {
+		// console.debug('popup mousemove event = ', event)
+
+		window.parent.postMessage(
+			{ name: 'mousemove', coordinates: { screenX: event.screenX, screenY: event.screenY } },
+			currentTab.url
+		)
+	})
+
 	loadForm.addEventListener('submit', event => {
 		event.preventDefault()
 
@@ -49,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		document.documentElement.style.setProperty('--site-border-color', colors.border)
 
 		// console.debug('window.parent = ', window.parent)
-		window.parent.postMessage({ colors }, currentTab.url)
+		window.parent.postMessage({ name: 'setColors', colors: colors }, currentTab.url)
 	}
 
 	const displayLyrics = (songData, lyricsHTML) => {

@@ -23,7 +23,8 @@ window.PopupContainer = class {
 		this.header = this.#headerConstructor()
 		this.element.appendChild(this.header)
 
-		this.element.appendChild(this.#iframeConstructor())
+		this.iframe = this.#iframeConstructor()
+		this.element.appendChild(this.iframe)
 
 		this.#windowMessagesConstructor()
 	}
@@ -95,13 +96,10 @@ window.PopupContainer = class {
 		})
 		resizeObserver.observe(element)
 
-		element.draggingEvent = event => {
-			// console.debug('event.clientX = ', event.clientX)
-			// console.debug('element.movePosition.left = ', element.movePosition.left)
-
+		element.movingEvent = event => {
 			const
-				newLeft = event.clientX - element.movePosition.left,
-				newTop = event.clientY - element.movePosition.top
+				newLeft = event.screenX - element.moveScreenPosition.x,
+				newTop = event.screenY - element.moveScreenPosition.y
 
 			element.style.left = `${newLeft}px`
 			element.style.top = `${newTop}px`
@@ -165,28 +163,21 @@ window.PopupContainer = class {
 		header.appendChild(closeButton)
 
 		header.addEventListener('mousedown', event => {
-			this.element.movePosition = {
-				left: event.clientX - this.element.offsetLeft,
-				top: event.clientY - this.element.offsetTop
+			// console.debug('header mousedown event = ', event)
+
+			this.element.moveScreenPosition = {
+				x: event.screenX - this.element.offsetLeft,
+				y: event.screenY - this.element.offsetTop
 			}
 
-			header.addEventListener('mousemove', this.element.draggingEvent)
+			document.addEventListener('mousemove', this.element.movingEvent)
 		})
 
 		header.addEventListener('mouseup', _event => {
 			// console.debug('header mouseup')
 
-			this.element.movePosition = null
-			header.removeEventListener('mousemove', this.element.draggingEvent)
-		})
-
-		header.addEventListener('mouseout', _event => {
-			// console.debug('header mouseout')
-
-			// this.element.draggingEvent(event)
-
-			this.element.movePosition = null
-			header.removeEventListener('mousemove', this.element.draggingEvent)
+			this.element.moveScreenPosition = null
+			document.removeEventListener('mousemove', this.element.movingEvent)
 		})
 
 		return header
@@ -213,8 +204,21 @@ window.PopupContainer = class {
 
 			if (event.origin != `chrome-extension://${chrome.runtime.id}`) return
 
-			this.element.style.borderColor = event.data.colors.border
-			this.header.style.background = this.element.style.borderColor
+			switch (event.data.name) {
+				case 'setColors':
+					this.element.style.borderColor = event.data.colors.border
+					this.header.style.background = this.element.style.borderColor
+
+					break
+				case 'mousemove':
+					if (!this.element.moveScreenPosition) return
+
+					this.element.movingEvent(event.data.coordinates)
+
+					break
+				default:
+					console.error('Undefined window message recieved: ', event)
+			}
 		}
 		window.addEventListener('message', window.popupMessageListener)
 	}
