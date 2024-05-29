@@ -97,16 +97,14 @@ window.PopupContainer = class {
 
 		element.draggingEvent = event => {
 			// console.debug('event.clientX = ', event.clientX)
-			// console.debug('element.lastPosition.left = ', element.lastPosition.left)
+			// console.debug('element.movePosition.left = ', element.movePosition.left)
 
 			const
-				newLeft = element.offsetLeft + event.clientX - element.lastPosition.left,
-				newTop = element.offsetTop + event.clientY - element.lastPosition.top
+				newLeft = event.clientX - element.movePosition.left,
+				newTop = event.clientY - element.movePosition.top
 
 			element.style.left = `${newLeft}px`
 			element.style.top = `${newTop}px`
-
-			element.lastPosition = { left: event.clientX, top: event.clientY }
 		}
 
 		return element
@@ -167,7 +165,10 @@ window.PopupContainer = class {
 		header.appendChild(closeButton)
 
 		header.addEventListener('mousedown', event => {
-			this.element.lastPosition = { left: event.clientX, top: event.clientY }
+			this.element.movePosition = {
+				left: event.clientX - this.element.offsetLeft,
+				top: event.clientY - this.element.offsetTop
+			}
 
 			header.addEventListener('mousemove', this.element.draggingEvent)
 		})
@@ -175,7 +176,7 @@ window.PopupContainer = class {
 		header.addEventListener('mouseup', _event => {
 			// console.debug('header mouseup')
 
-			this.element.lastPosition = null
+			this.element.movePosition = null
 			header.removeEventListener('mousemove', this.element.draggingEvent)
 		})
 
@@ -184,7 +185,7 @@ window.PopupContainer = class {
 
 			// this.element.draggingEvent(event)
 
-			this.element.lastPosition = null
+			this.element.movePosition = null
 			header.removeEventListener('mousemove', this.element.draggingEvent)
 		})
 
