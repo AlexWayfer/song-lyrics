@@ -172,6 +172,7 @@ window.PopupContainer = class {
 			font-size: 16px;
 			font-weight: bold;
 			padding-bottom: 0.2em;
+			color: inherit;
 		`
 
 		header.appendChild(title)
@@ -181,6 +182,10 @@ window.PopupContainer = class {
 		closeButton.style = `
 			line-height: 1em;
 			padding: 0.4em;
+			color: inherit;
+			background: transparent;
+			border: none;
+			cursor: pointer;
 		`
 
 		closeButton.addEventListener('click', _event => {
@@ -252,6 +257,7 @@ window.PopupContainer = class {
 				case 'setColors':
 					this.element.style.borderColor = event.data.colors.border
 					this.header.style.background = this.element.style.borderColor
+					this.header.style.color = event.data.colors.text
 
 					break
 				case 'mousemove':
