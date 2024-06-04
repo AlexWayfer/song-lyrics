@@ -51,14 +51,41 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		searchLyrics(queryInput.value)
 	})
 
+	const passColorsToParentWindow = () => {
+		// console.debug('window.parent = ', window.parent)
+
+		const
+			bodyStyle = getComputedStyle(document.body),
+			colors = {
+				background: bodyStyle.getPropertyValue('--background-color'),
+				text: bodyStyle.getPropertyValue('--text-color'),
+				link: bodyStyle.getPropertyValue('--link-color'),
+				border: bodyStyle.getPropertyValue('--border-color')
+			}
+
+		// console.debug('bodyStyle = ', bodyStyle)
+		// console.debug('colors = ', colors)
+
+		window.parent.postMessage({ name: 'setColors', colors: colors }, currentTab.url)
+	}
+
 	const setColors = colors => {
 		document.documentElement.style.setProperty('--site-background-color', colors.background)
 		document.documentElement.style.setProperty('--site-text-color', colors.text)
 		document.documentElement.style.setProperty('--site-link-color', colors.link)
 		document.documentElement.style.setProperty('--site-border-color', colors.border)
 
-		// console.debug('window.parent = ', window.parent)
-		window.parent.postMessage({ name: 'setColors', colors: colors }, currentTab.url)
+		// console.debug('document.documentElement.style = ', document.documentElement.style)
+		// console.debug(
+		// 	"document.documentElement.style.getProperty('--site-background-color') = ",
+		// 	document.documentElement.style.getProperty('--site-background-color')
+		// )
+		// console.debug(
+		// 	"document.documentElement.style.getProperty('--background-color') = ",
+		// 	document.documentElement.style.getProperty('--background-color')
+		// )
+
+		passColorsToParentWindow()
 	}
 
 	const displayLyrics = (songData, lyricsHTML) => {
@@ -847,6 +874,8 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			document.body.classList.add(
 				window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-theme' : 'light-theme'
 			)
+
+			passColorsToParentWindow()
 
 			let
 				issueTitle = `Please add support of \`${currentTabHostname}\` as a music platform`,
