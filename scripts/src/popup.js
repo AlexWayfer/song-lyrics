@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		otherSearchResultsList = otherSearchResultsContainer.querySelector('ul'),
 		otherSearchResultTemplate = otherSearchResultsList.querySelector('template'),
 		searchPageLink = document.querySelector('a.search-page'),
+		breakdownNotice = document.querySelector('body > .breakdown'),
 		loadForm = document.querySelector('body > form.load'),
 		queryInput = loadForm.querySelector('input[name="query"]')
 
@@ -44,6 +45,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		lyricsContainer.classList.add('hidden')
 		otherSearchResultsContainer.classList.add('hidden')
 		searchPageLink.classList.add('hidden')
+		breakdownNotice.classList.add('hidden')
 
 		loadForm.classList.remove('hidden')
 		loadingNotice.classList.remove('hidden')
@@ -69,6 +71,13 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		window.parent.postMessage({ name: 'setColors', colors: colors }, currentTab.url)
 	}
 
+	const switchToSystemTheme = () => {
+		document.body.classList.remove('site-theme')
+		document.body.classList.add(
+			window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-theme' : 'light-theme'
+		)
+	}
+
 	const setColors = colors => {
 		document.documentElement.style.setProperty('--site-background-color', colors.background)
 		document.documentElement.style.setProperty('--site-text-color', colors.text)
@@ -86,6 +95,32 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		// )
 
 		passColorsToParentWindow()
+	}
+
+	const buildGitHubNewIssueURI = (title, body) => {
+		return `https://github.com/AlexWayfer/song-lyrics/issues/new?title=${title}&body=${body}`
+	}
+
+	const displayBreakdown = () => {
+		//// Display elements
+		loadingNotice.classList.add('hidden')
+		captchaNotice.classList.add('hidden')
+		notFoundNotice.classList.add('hidden')
+		notSupportedNotice.classList.add('hidden')
+		lyricsContainer.classList.add('hidden')
+		otherSearchResultsContainer.classList.add('hidden')
+
+		switchToSystemTheme()
+
+		passColorsToParentWindow()
+
+		breakdownNotice.querySelector('a.report').href = buildGitHubNewIssueURI(
+			`Please fix support of \`${currentTabHostname}\``,
+			"There was an unexpected error. Thank you."
+		)
+
+		breakdownNotice.classList.remove('hidden')
+		loadForm.classList.remove('hidden')
 	}
 
 	const displayLyrics = (songData, lyricsHTML) => {
@@ -114,6 +149,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		captchaNotice.classList.add('hidden')
 		notFoundNotice.classList.add('hidden')
 		notSupportedNotice.classList.add('hidden')
+		breakdownNotice.classList.add('hidden')
 
 		lyricsContainer.classList.remove('hidden')
 		otherSearchResultsContainer.classList.remove('hidden')
@@ -286,6 +322,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			lyricsContainer.classList.add('hidden')
 			otherSearchResultsContainer.classList.add('hidden')
 			notSupportedNotice.classList.add('hidden')
+			breakdownNotice.classList.add('hidden')
 
 			notFoundNotice.classList.remove('hidden')
 			loadForm.classList.remove('hidden')
@@ -380,22 +417,29 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				}
 			}, injectionResult => {
 				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				let
-					{ songTitle, songArtists, colors } = injectionResult[0].result
+				const result = injectionResult[0].result
 
-				console.debug('songTitle = ', songTitle)
-				console.debug('songArtists = ', songArtists)
+				// console.debug('result = ', result)
 
-				songTitle = clearFeaturing(songTitle)
-				//// Take only the first artist, second can be from the featuring
-				let songArtist = songArtists.split(', ', 2)[0]
+				if (result) {
+					let { songTitle, songArtists, colors } = result
 
-				const query = `${songTitle} ${songArtist}`
-				console.debug('query = ', query)
+					console.debug('songTitle = ', songTitle)
+					console.debug('songArtists = ', songArtists)
 
-				setColors(colors)
+					songTitle = clearFeaturing(songTitle)
+					//// Take only the first artist, second can be from the featuring
+					let songArtist = songArtists.split(', ', 2)[0]
 
-				searchLyrics(query)
+					const query = `${songTitle} ${songArtist}`
+					console.debug('query = ', query)
+
+					setColors(colors)
+
+					searchLyrics(query)
+				} else {
+					displayBreakdown()
+				}
 			})
 
 			break
@@ -422,20 +466,27 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				}
 			}, injectionResult => {
 				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				let
-					{ songTitle, songArtists, colors } = injectionResult[0].result
+				const result = injectionResult[0].result
 
-				console.debug('songTitle = ', songTitle)
-				console.debug('songArtists = ', songArtists)
+				// console.debug('result = ', result)
 
-				songTitle = clearFeaturing(songTitle)
+				if (result) {
+					let { songTitle, songArtists, colors } = result
 
-				const query = `${songTitle} ${songArtists}`
-				console.debug('query = ', query)
+					console.debug('songTitle = ', songTitle)
+					console.debug('songArtists = ', songArtists)
 
-				setColors(colors)
+					songTitle = clearFeaturing(songTitle)
 
-				searchLyrics(query)
+					const query = `${songTitle} ${songArtists}`
+					console.debug('query = ', query)
+
+					setColors(colors)
+
+					searchLyrics(query)
+				} else {
+					displayBreakdown()
+				}
 			})
 
 			break
@@ -468,20 +519,27 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				}
 			}, injectionResult => {
 				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				let
-					{ songTitle, songArtists, colors } = injectionResult[0].result
+				const result = injectionResult[0].result
 
-				console.debug('songTitle = ', songTitle)
-				console.debug('songArtists = ', songArtists)
+				// console.debug('result = ', result)
 
-				songTitle = clearFeaturing(songTitle)
+				if (result) {
+					let { songTitle, songArtists, colors } = result
 
-				const query = `${songTitle} ${songArtists}`
-				console.debug('query = ', query)
+					console.debug('songTitle = ', songTitle)
+					console.debug('songArtists = ', songArtists)
 
-				setColors(colors)
+					songTitle = clearFeaturing(songTitle)
 
-				searchLyrics(query)
+					const query = `${songTitle} ${songArtists}`
+					console.debug('query = ', query)
+
+					setColors(colors)
+
+					searchLyrics(query)
+				} else {
+					displayBreakdown()
+				}
 			})
 
 			break
@@ -514,20 +572,27 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				}
 			}, injectionResult => {
 				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				let
-					{ songTitle, songArtists, colors } = injectionResult[0].result
+				const result = injectionResult[0].result
 
-				console.debug('songTitle = ', songTitle)
-				console.debug('songArtists = ', songArtists)
+				// console.debug('result = ', result)
 
-				songTitle = clearFeaturing(songTitle)
+				if (result) {
+					let { songTitle, songArtists, colors } = result
 
-				const query = `${songTitle} ${songArtists}`
-				console.debug('query = ', query)
+					console.debug('songTitle = ', songTitle)
+					console.debug('songArtists = ', songArtists)
 
-				setColors(colors)
+					songTitle = clearFeaturing(songTitle)
 
-				searchLyrics(query)
+					const query = `${songTitle} ${songArtists}`
+					console.debug('query = ', query)
+
+					setColors(colors)
+
+					searchLyrics(query)
+				} else {
+					displayBreakdown()
+				}
 			})
 
 			break
@@ -557,20 +622,27 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				}
 			}, injectionResult => {
 				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				let
-					{ songTitle, songArtists, colors } = injectionResult[0].result
+				const result = injectionResult[0].result
 
-				console.debug('songTitle = ', songTitle)
-				console.debug('songArtists = ', songArtists)
+				// console.debug('result = ', result)
 
-				songTitle = clearFeaturing(songTitle)
+				if (result) {
+					let { songTitle, songArtists, colors } = result
 
-				const query = `${songTitle} ${songArtists}`
-				console.debug('query = ', query)
+					console.debug('songTitle = ', songTitle)
+					console.debug('songArtists = ', songArtists)
 
-				setColors(colors)
+					songTitle = clearFeaturing(songTitle)
 
-				searchLyrics(query)
+					const query = `${songTitle} ${songArtists}`
+					console.debug('query = ', query)
+
+					setColors(colors)
+
+					searchLyrics(query)
+				} else {
+					displayBreakdown()
+				}
 			})
 
 			break
@@ -596,45 +668,54 @@ document.addEventListener('DOMContentLoaded', async _event => {
 					}
 				}
 			}, injectionResult => {
-				// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				let { videoTitle, channelName, chapterTitle, colors } = injectionResult[0].result
-				let songTitile = chapterTitle || videoTitle
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				const result = injectionResult[0].result
 
-				console.debug('videoTitle = ', videoTitle)
-				console.debug('channelName = ', channelName)
-				console.debug('chapterTitle = ', chapterTitle)
-				console.debug('songTitile = ', songTitile)
+				// console.debug('result = ', result)
 
-				//// Remove additional notes from song title
-				songTitile = songTitile.replace(
-					new RegExp(
-						'(?:' +
-							'[([](?:' +
-								'(?:\\w+ )*(?:Video(?: (?:HD|- Official))?|Soundtrack)|' +
-								'From [^)]*|' +
-								'Lyrics|' +
-								'OUT NOW|' +
-								'Single(?: \\d+)?|' +
-								'Премьера (?:клипа|песни|трека)[^)]*' +
-							')[\\])]|' +
-							'\\| (?:' +
-								'Реакция и разбор' +
-							')' +
-						')',
-						'i'
-					),
-					''
-				)
+				if (result) {
+					let
+						{ videoTitle, channelName, chapterTitle, colors } = result,
+						songTitile = chapterTitle || videoTitle
 
-				songTitile = clearFeaturing(songTitile)
+					console.debug('videoTitle = ', videoTitle)
+					console.debug('channelName = ', channelName)
+					console.debug('chapterTitle = ', chapterTitle)
+					console.debug('songTitile = ', songTitile)
 
-				let query = songTitile.includes(' - ') ? songTitile : `${songTitile} ${channelName}`
+					//// Remove additional notes from song title
+					songTitile = songTitile.replace(
+						new RegExp(
+							'(?:' +
+								'[([](?:' +
+									'(?:\\w+ )*(?:Video(?: (?:HD|- Official))?|Soundtrack)|' +
+									'From [^)]*|' +
+									'Lyrics|' +
+									'OUT NOW|' +
+									'Single(?: \\d+)?|' +
+									'Премьера (?:клипа|песни|трека)[^)]*' +
+								')[\\])]|' +
+								'\\| (?:' +
+									'Реакция и разбор' +
+								')' +
+							')',
+							'i'
+						),
+						''
+					)
 
-				console.debug('query = ', query)
+					songTitile = clearFeaturing(songTitile)
 
-				setColors(colors)
+					let query = songTitile.includes(' - ') ? songTitile : `${songTitile} ${channelName}`
 
-				searchLyrics(query)
+					console.debug('query = ', query)
+
+					setColors(colors)
+
+					searchLyrics(query)
+				} else {
+					displayBreakdown()
+				}
 			})
 
 			break
@@ -664,20 +745,27 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				}
 			}, injectionResult => {
 				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				let
-					{ songTitle, songArtists, colors } = injectionResult[0].result
+				const result = injectionResult[0].result
 
-				console.debug('songTitle = ', songTitle)
-				console.debug('songArtists = ', songArtists)
+				// console.debug('result = ', result)
 
-				songTitle = clearFeaturing(songTitle)
+				if (result) {
+					let { songTitle, songArtists, colors } = result
 
-				const query = `${songTitle} ${songArtists}`
-				console.debug('query = ', query)
+					console.debug('songTitle = ', songTitle)
+					console.debug('songArtists = ', songArtists)
 
-				setColors(colors)
+					songTitle = clearFeaturing(songTitle)
 
-				searchLyrics(query)
+					const query = `${songTitle} ${songArtists}`
+					console.debug('query = ', query)
+
+					setColors(colors)
+
+					searchLyrics(query)
+				} else {
+					displayBreakdown()
+				}
 			})
 
 			break
@@ -720,17 +808,23 @@ document.addEventListener('DOMContentLoaded', async _event => {
 					}
 				}
 			}, injectionResult => {
-				console.debug('injectionResult = ', injectionResult)
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				const result = injectionResult[0].result
 
-				// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				let { songTitle, songArtist, colors } = injectionResult[0].result
+				// console.debug('result = ', result)
 
-				console.debug('songTitle = ', songTitle)
-				console.debug('songArtist = ', songArtist)
+				if (result) {
+					let { songTitle, songArtist, colors } = result
 
-				setColors(colors)
+					console.debug('songTitle = ', songTitle)
+					console.debug('songArtist = ', songArtist)
 
-				searchLyrics(`${songTitle} ${songArtist}`)
+					setColors(colors)
+
+					searchLyrics(`${songTitle} ${songArtist}`)
+				} else {
+					displayBreakdown()
+				}
 			})
 
 			break
@@ -770,18 +864,26 @@ document.addEventListener('DOMContentLoaded', async _event => {
 					}
 				}
 			}, injectionResult => {
-				// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				let { songTitle, songArtist, colors } = injectionResult[0].result
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				const result = injectionResult[0].result
 
-				console.debug('songTitle = ', songTitle)
-				console.debug('songArtist = ', songArtist)
+				// console.debug('result = ', result)
 
-				songTitle = clearFeaturing(songTitle)
-				songArtist = songArtist.trim()
+				if (result) {
+					let { songTitle, songArtist, colors } = result
 
-				setColors(colors)
+					console.debug('songTitle = ', songTitle)
+					console.debug('songArtist = ', songArtist)
 
-				searchLyrics(`${songTitle} ${songArtist}`)
+					songTitle = clearFeaturing(songTitle)
+					songArtist = songArtist.trim()
+
+					setColors(colors)
+
+					searchLyrics(`${songTitle} ${songArtist}`)
+				} else {
+					displayBreakdown()
+				}
 			})
 
 			break
@@ -815,18 +917,26 @@ document.addEventListener('DOMContentLoaded', async _event => {
 					}
 				}
 			}, injectionResult => {
-				// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				let { songTitle, songArtist, colors } = injectionResult[0].result
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				const result = injectionResult[0].result
 
-				console.debug('songTitle = ', songTitle)
-				console.debug('songArtist = ', songArtist)
+				// console.debug('result = ', result)
 
-				songTitle = clearFeaturing(songTitle)
-				songArtist = songArtist.trim()
+				if (result) {
+					let { songTitle, songArtist, colors } = result
 
-				setColors(colors)
+					console.debug('songTitle = ', songTitle)
+					console.debug('songArtist = ', songArtist)
 
-				searchLyrics(`${songTitle} ${songArtist}`)
+					songTitle = clearFeaturing(songTitle)
+					songArtist = songArtist.trim()
+
+					setColors(colors)
+
+					searchLyrics(`${songTitle} ${songArtist}`)
+				} else {
+					displayBreakdown()
+				}
 			})
 
 			break
@@ -846,17 +956,25 @@ document.addEventListener('DOMContentLoaded', async _event => {
 					}
 				})
 			}, injectionResult => {
-				// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				let { songTitle, songArtist, colors } = injectionResult[0].result
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				const result = injectionResult[0].result
 
-				console.debug('songTitle = ', songTitle)
-				console.debug('songArtist = ', songArtist)
+				// console.debug('result = ', result)
 
-				songTitle = clearFeaturing(songTitle)
+				if (result) {
+					let { songTitle, songArtist, colors } = result
 
-				setColors(colors)
+					console.debug('songTitle = ', songTitle)
+					console.debug('songArtist = ', songArtist)
 
-				searchLyrics(`${songTitle} ${songArtist}`)
+					songTitle = clearFeaturing(songTitle)
+
+					setColors(colors)
+
+					searchLyrics(`${songTitle} ${songArtist}`)
+				} else {
+					displayBreakdown()
+				}
 			})
 
 			break
@@ -868,20 +986,16 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			otherSearchResultsContainer.classList.add('hidden')
 			notFoundNotice.classList.add('hidden')
 			searchPageLink.classList.add('hidden')
+			breakdownNotice.classList.add('hidden')
 
-			document.body.classList.remove('site-theme')
-			document.body.classList.add(
-				window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-theme' : 'light-theme'
-			)
+			switchToSystemTheme()
 
 			passColorsToParentWindow()
 
-			let
-				issueTitle = `Please add support of \`${currentTabHostname}\` as a music platform`,
-				issueBody = "I think it's appropriate for this extension. Thank you."
-
-			notSupportedNotice.querySelector('a.request').href =
-				`https://github.com/AlexWayfer/song-lyrics/issues/new?title=${issueTitle}&body=${issueBody}`
+			notSupportedNotice.querySelector('a.request').href = buildGitHubNewIssueURI(
+				`Please add support of \`${currentTabHostname}\` as a music platform`,
+				"I think it's appropriate for this extension. Thank you."
+			)
 
 			notSupportedNotice.classList.remove('hidden')
 			loadForm.classList.remove('hidden')
