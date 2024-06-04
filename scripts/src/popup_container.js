@@ -40,7 +40,27 @@ window.PopupContainer = class {
 	}
 
 	get #settings() {
-		return (async () => (await chrome.storage.local.get({ popupSettings: {} })).popupSettings)()
+		return (async () => {
+			const popupSettings = (await chrome.storage.local.get({ popupSettings: {} })).popupSettings
+
+			// console.debug('popupSettings = ', popupSettings)
+			// console.debug('window.location.host = ', window.location.host)
+
+			return popupSettings
+		})()
+	}
+
+	get #settingsPerHost() {
+		return (async () => {
+			const settings = await this.#settings
+
+			// console.debug('settings = ', settings)
+			// console.debug('window.location.host = ', window.location.host)
+
+			const settingsPerHost = settings[window.location.host] ??= {}
+
+			return settingsPerHost
+		})()
 	}
 
 	set #settings(newValues) {
@@ -55,19 +75,31 @@ window.PopupContainer = class {
 		})()
 	}
 
+	set #settingsPerHost(newValues) {
+		return (async () => {
+			const settingsPerHost = await this.#settingsPerHost
+
+			// console.debug('settings = ', settings)
+			// console.debug('newValues = ', newValues)
+			// console.debug('Object.assign(settings, newValues) = ', Object.assign(settings, newValues))
+
+			this.#settings = { [window.location.host]: Object.assign(settingsPerHost, newValues) }
+		})()
+	}
+
 	async #elementConstructor() {
 		const element = document.createElement('div')
 
 		element.id = this.constructor.#elementId
 
 		const
-			settings = await this.#settings,
-			width = `${settings.width || 500}px`,
-			height = `${settings.height || 600}px`,
-			top = settings.top || '50px',
-			left = settings.left || `calc(100vw - ${width} - 50px)`
+			settingsPerHost = await this.#settingsPerHost,
+			width = `${settingsPerHost.width || 500}px`,
+			height = `${settingsPerHost.height || 600}px`,
+			top = settingsPerHost.top || '50px',
+			left = settingsPerHost.left || `calc(100vw - ${width} - 50px)`
 
-		// console.debug('settings = ', settings)
+		// console.debug('settingsPerHost = ', settingsPerHost)
 
 		element.style = `
 			display: flex;
@@ -101,7 +133,7 @@ window.PopupContainer = class {
 
 				// console.debug('rewrite sizes')
 
-				this.#settings = { width, height }
+				this.#settingsPerHost = { width, height }
 			}, 200)
 		})
 		resizeObserver.observe(element)
@@ -114,7 +146,7 @@ window.PopupContainer = class {
 			element.style.left = `${newLeft}px`
 			element.style.top = `${newTop}px`
 
-			this.#settings = { left: element.style.left, top: element.style.top }
+			this.#settingsPerHost = { left: element.style.left, top: element.style.top }
 		}
 
 		return element
