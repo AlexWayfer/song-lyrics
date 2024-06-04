@@ -64,7 +64,7 @@ window.PopupContainer = class {
 	}
 
 	set #settings(newValues) {
-		return (async () => {
+		(async () => {
 			const settings = await this.#settings
 
 			// console.debug('settings = ', settings)
@@ -76,7 +76,7 @@ window.PopupContainer = class {
 	}
 
 	set #settingsPerHost(newValues) {
-		return (async () => {
+		(async () => {
 			const settingsPerHost = await this.#settingsPerHost
 
 			// console.debug('settings = ', settings)
