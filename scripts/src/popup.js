@@ -868,7 +868,6 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			otherSearchResultsContainer.classList.add('hidden')
 			notFoundNotice.classList.add('hidden')
 			searchPageLink.classList.add('hidden')
-			loadForm.classList.add('hidden')
 
 			document.body.classList.remove('site-theme')
 			document.body.classList.add(
@@ -885,6 +884,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				`https://github.com/AlexWayfer/song-lyrics/issues/new?title=${issueTitle}&body=${issueBody}`
 
 			notSupportedNotice.classList.remove('hidden')
+			loadForm.classList.remove('hidden')
 		}
 	}
 })
