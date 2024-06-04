@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 4.0 (2024-06-05)
+
+*   Make popup window as iframe.
+    Resizable and movable.
+    Position and size are saving per site.
+*   Pass colors from popup iframe even when site is unsupported.
+*   Add music platforms for popup iframe on non-supported sites.
+*   Add query form for unsupported sites.
+*   Add an error notice when site doesn't work as expected.
+    With a link to contact the developer.
 *   Write usage instructions.
 *   Remove trash in square parentheses from YouTube requests.
 *   Add CHANGELOG.
