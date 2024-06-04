@@ -44,7 +44,15 @@ window.PopupContainer = class {
 	}
 
 	set #settings(newValues) {
-		chrome.storage.local.set({ popupSettings: Object.assign(this.#settings, newValues) })
+		return (async () => {
+			const settings = await this.#settings
+
+			// console.debug('settings = ', settings)
+			// console.debug('newValues = ', newValues)
+			// console.debug('Object.assign(settings, newValues) = ', Object.assign(settings, newValues))
+
+			chrome.storage.local.set({ popupSettings: Object.assign(settings, newValues) })
+		})()
 	}
 
 	async #elementConstructor() {
@@ -55,7 +63,9 @@ window.PopupContainer = class {
 		const
 			settings = await this.#settings,
 			width = `${settings.width || 500}px`,
-			height = `${settings.height || 600}px`
+			height = `${settings.height || 600}px`,
+			top = settings.top || '50px',
+			left = settings.left || `calc(100vw - ${width} - 50px)`
 
 		// console.debug('settings = ', settings)
 
@@ -65,8 +75,8 @@ window.PopupContainer = class {
 			resize: both;
 			overflow: auto;
 			position: fixed;
-			top: 50px;
-			left: calc(100vw - ${width} - 50px);
+			top: ${top};
+			left: ${left};
 			width: ${width};
 			height: ${height};
 			border-width: ${this.constructor.#borderWidth};
@@ -103,6 +113,8 @@ window.PopupContainer = class {
 
 			element.style.left = `${newLeft}px`
 			element.style.top = `${newTop}px`
+
+			this.#settings = { left: element.style.left, top: element.style.top }
 		}
 
 		return element
