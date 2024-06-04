@@ -175,14 +175,23 @@ body {
 		white-space: nowrap;
 		text-align: center;
 
-		& p {
-			color: red;
+		& h4 {
 			margin: 0;
 		}
 	}
 
+	& .not-found {
+		& h4 {
+			color: red;
+		}
+	}
+
 	& .not-supported {
-		& a {
+		& > ul {
+			text-align: left;
+		}
+
+		& > a {
 			display: inline-block;
 			margin-top: 1em;
 		}

@@ -171,6 +171,7 @@ window.PopupContainer = class {
 		title.style = `
 			font-size: 16px;
 			font-weight: bold;
+			margin: 0;
 			padding-bottom: 0.2em;
 			color: inherit;
 		`
