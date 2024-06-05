@@ -1,7 +1,7 @@
 {
 	"manifest_version": 3,
 	"name": "Song Lyrics",
-	"description": "Extension for displaying current song lyrics",
+	"description": "Display current song lyrics for music platforms, such as Spotify, Apple Music, Deezer, YouTube, etc.",
 	"version": "4.0.1",
 	"action": {
 		"popup": "pages/popup.html"
