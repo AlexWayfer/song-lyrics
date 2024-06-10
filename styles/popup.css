@@ -76,17 +76,43 @@ body {
 				margin-right: 0.8em;
 			}
 
-			.right-part {
-				.title {
-					margin: 0.2em 0;
+			& > .right-part {
+				flex-grow: 1;
+				display: flex;
+
+				& > .left-part {
+					flex-grow: 1;
+
+					.title {
+						margin: 0.2em 0;
+					}
+
+					.link {
+						font-size: 0.9em;
+					}
+
+					p.other-search-results {
+						margin: 1em 0 0;
+					}
 				}
 
-				.link {
-					font-size: 0.9em;
-				}
+				& > .right-part {
+					button {
+						padding: 0.4em;
+						background: transparent;
+						border: none;
 
-				p.other-search-results {
-					margin: 1em 0 0;
+						&.refresh {
+							cursor: pointer;
+
+							svg {
+								--size: 1.5em;
+
+								width: var(--size);
+								height: var(--size);
+							}
+						}
+					}
 				}
 			}
 		}

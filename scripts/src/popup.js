@@ -39,18 +39,11 @@ document.addEventListener('DOMContentLoaded', async _event => {
 	loadForm.addEventListener('submit', event => {
 		event.preventDefault()
 
-		captchaNotice.classList.add('hidden')
-		notFoundNotice.classList.add('hidden')
-		notSupportedNotice.classList.add('hidden')
-		lyricsContainer.classList.add('hidden')
-		otherSearchResultsContainer.classList.add('hidden')
-		searchPageLink.classList.add('hidden')
-		breakdownNotice.classList.add('hidden')
-
-		loadForm.classList.remove('hidden')
-		loadingNotice.classList.remove('hidden')
-
 		searchLyrics(queryInput.value)
+	})
+
+	document.querySelector('button.refresh').addEventListener('click', () => {
+		parseAndSearchLyrics()
 	})
 
 	const passColorsToParentWindow = () => {
@@ -241,7 +234,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		return lyricsHTML
 	}
 
-	const loadLyrics = async songId => {
+	const loadLyricsForSong = async songId => {
 		loadingNotice.classList.remove('hidden')
 
 		const
@@ -277,7 +270,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 	const displaySearchResults = async songHits => {
 		if (songHits.length > 0) {
-			await loadLyrics(songHits[0].result.id)
+			await loadLyricsForSong(songHits[0].result.id)
 
 			if (songHits.length > 1) {
 				const otherSearchResultsElements = songHits.slice(0, 5).map((songHit, index) => {
@@ -301,7 +294,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 						loadingQueryText.innerText = songHit.result.full_title
 
-						await loadLyrics(songHit.result.id)
+						await loadLyricsForSong(songHit.result.id)
 					})
 
 					return otherSearchElement
@@ -332,6 +325,17 @@ document.addEventListener('DOMContentLoaded', async _event => {
 	}
 
 	const searchLyrics = async query => {
+		captchaNotice.classList.add('hidden')
+		notFoundNotice.classList.add('hidden')
+		notSupportedNotice.classList.add('hidden')
+		lyricsContainer.classList.add('hidden')
+		otherSearchResultsContainer.classList.add('hidden')
+		searchPageLink.classList.add('hidden')
+		breakdownNotice.classList.add('hidden')
+
+		loadForm.classList.remove('hidden')
+		loadingNotice.classList.remove('hidden')
+
 		query = query.trim()
 
 		const encodedQuery = encodeURIComponent(query)
@@ -394,611 +398,615 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		return text.replace(/ [([]?(?:f(ea)?t|prod)\.? [^()[\]]+[)\]]?/, ' ')
 	}
 
-	switch (currentTabHostname) {
-		case 'deezer.com':
-		case 'www.deezer.com': {
-			chrome.scripting.executeScript({
-				target: { tabId: currentTab.id },
-				func: () => {
-					const
-						documentStyle = getComputedStyle(document.documentElement),
-						pagePlayer = document.querySelector('#page_player')
+	const parseAndSearchLyrics = () => {
+		switch (currentTabHostname) {
+			case 'deezer.com':
+			case 'www.deezer.com': {
+				chrome.scripting.executeScript({
+					target: { tabId: currentTab.id },
+					func: () => {
+						const
+							documentStyle = getComputedStyle(document.documentElement),
+							pagePlayer = document.querySelector('#page_player')
 
-					return {
-						songTitle: pagePlayer.querySelector('[data-testid="item_title"]').innerText,
-						songArtists: pagePlayer.querySelector('[data-testid="item_subtitle"]').innerText,
-						colors: {
-							background: documentStyle.getPropertyValue('--tempo-colors-bg-main'),
-							text: documentStyle.getPropertyValue('--tempo-colors-text-main'),
-							link: documentStyle.getPropertyValue('--tempo-colors-text-secondary'),
-							border: documentStyle.getPropertyValue('--tempo-colors-divider-main')
+						return {
+							songTitle: pagePlayer.querySelector('[data-testid="item_title"]').innerText,
+							songArtists: pagePlayer.querySelector('[data-testid="item_subtitle"]').innerText,
+							colors: {
+								background: documentStyle.getPropertyValue('--tempo-colors-bg-main'),
+								text: documentStyle.getPropertyValue('--tempo-colors-text-main'),
+								link: documentStyle.getPropertyValue('--tempo-colors-text-secondary'),
+								border: documentStyle.getPropertyValue('--tempo-colors-divider-main')
+							}
 						}
 					}
-				}
-			}, injectionResult => {
-				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				const result = injectionResult[0].result
+				}, injectionResult => {
+					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+					const result = injectionResult[0].result
 
-				// console.debug('result = ', result)
+					// console.debug('result = ', result)
 
-				if (result) {
-					let { songTitle, songArtists, colors } = result
+					if (result) {
+						let { songTitle, songArtists, colors } = result
 
-					console.debug('songTitle = ', songTitle)
-					console.debug('songArtists = ', songArtists)
+						console.debug('songTitle = ', songTitle)
+						console.debug('songArtists = ', songArtists)
 
-					songTitle = clearFeaturing(songTitle)
-					//// Take only the first artist, second can be from the featuring
-					let songArtist = songArtists.split(', ', 2)[0]
+						songTitle = clearFeaturing(songTitle)
+						//// Take only the first artist, second can be from the featuring
+						let songArtist = songArtists.split(', ', 2)[0]
 
-					const query = `${songTitle} ${songArtist}`
-					console.debug('query = ', query)
+						const query = `${songTitle} ${songArtist}`
+						console.debug('query = ', query)
 
-					setColors(colors)
+						setColors(colors)
 
-					searchLyrics(query)
-				} else {
-					displayBreakdown()
-				}
-			})
-
-			break
-		}
-
-		case 'music.yandex.ru': {
-			chrome.scripting.executeScript({
-				target: { tabId: currentTab.id },
-				func: () => {
-					const
-						decoPaneStyle = getComputedStyle(document.querySelector('.deco-pane')),
-						playerControls = document.querySelector('.player-controls__track-container')
-
-					return {
-						songTitle: playerControls.querySelector('.track__title').innerText,
-						songArtists: playerControls.querySelector('.track__artists').innerText,
-						colors: {
-							background: decoPaneStyle.backgroundColor,
-							text: decoPaneStyle.color,
-							link: getComputedStyle(document.querySelector('.deco-link_muted')).color,
-							border: decoPaneStyle.borderColor
-						}
-					}
-				}
-			}, injectionResult => {
-				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				const result = injectionResult[0].result
-
-				// console.debug('result = ', result)
-
-				if (result) {
-					let { songTitle, songArtists, colors } = result
-
-					console.debug('songTitle = ', songTitle)
-					console.debug('songArtists = ', songArtists)
-
-					songTitle = clearFeaturing(songTitle)
-
-					const query = `${songTitle} ${songArtists}`
-					console.debug('query = ', query)
-
-					setColors(colors)
-
-					searchLyrics(query)
-				} else {
-					displayBreakdown()
-				}
-			})
-
-			break
-		}
-
-		case 'soundcloud.com': {
-			chrome.scripting.executeScript({
-				target: { tabId: currentTab.id },
-				func: () => {
-					const
-						playbackTitleContainer =
-							document.querySelector('.playbackSoundBadge__titleContextContainer')
-
-					return {
-						songTitle:
-							playbackTitleContainer
-								.querySelector('.playbackSoundBadge__title > a > span:not(.sc-visuallyhidden)')
-								.innerText,
-						songArtists:
-							playbackTitleContainer
-								.querySelector(':scope > a')
-								.innerText,
-						colors: {
-							background: getComputedStyle(document.querySelector('body')).backgroundColor,
-							text: getComputedStyle(document.querySelector('.sc-text')).color,
-							link: getComputedStyle(document.querySelector('.playButton')).backgroundColor,
-							border: getComputedStyle(document.querySelector('.sc-border-light-top')).borderColor
-						}
-					}
-				}
-			}, injectionResult => {
-				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				const result = injectionResult[0].result
-
-				// console.debug('result = ', result)
-
-				if (result) {
-					let { songTitle, songArtists, colors } = result
-
-					console.debug('songTitle = ', songTitle)
-					console.debug('songArtists = ', songArtists)
-
-					songTitle = clearFeaturing(songTitle)
-
-					const query = `${songTitle} ${songArtists}`
-					console.debug('query = ', query)
-
-					setColors(colors)
-
-					searchLyrics(query)
-				} else {
-					displayBreakdown()
-				}
-			})
-
-			break
-		}
-
-		case 'open.spotify.com': {
-			chrome.scripting.executeScript({
-				target: { tabId: currentTab.id },
-				func: () => {
-					const
-						nowPlayingWidget = document.querySelector('[data-testid="now-playing-widget"]'),
-						documentStyle = getComputedStyle(document.body)
-
-					return {
-						songTitle:
-							nowPlayingWidget
-								.querySelector('[data-testid="context-item-link"]')
-								.innerText,
-						songArtists:
-							nowPlayingWidget
-								.querySelector('[data-testid="context-item-info-subtitles"]')
-								.innerText,
-						colors: {
-							background: documentStyle.getPropertyValue('--background-base'),
-							text: documentStyle.getPropertyValue('--text-base'),
-							link: documentStyle.getPropertyValue('--text-bright-accent'),
-							border: documentStyle.getPropertyValue('--decorative-subdued')
-						}
-					}
-				}
-			}, injectionResult => {
-				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				const result = injectionResult[0].result
-
-				// console.debug('result = ', result)
-
-				if (result) {
-					let { songTitle, songArtists, colors } = result
-
-					console.debug('songTitle = ', songTitle)
-					console.debug('songArtists = ', songArtists)
-
-					songTitle = clearFeaturing(songTitle)
-
-					const query = `${songTitle} ${songArtists}`
-					console.debug('query = ', query)
-
-					setColors(colors)
-
-					searchLyrics(query)
-				} else {
-					displayBreakdown()
-				}
-			})
-
-			break
-		}
-
-		case 'music.apple.com': {
-			chrome.scripting.executeScript({
-				target: { tabId: currentTab.id },
-				func: () => {
-					const
-						playerBar = document.querySelector('.player-bar amp-lcd').shadowRoot,
-						documentStyle = getComputedStyle(document.documentElement)
-
-					return {
-						songTitle:
-							playerBar.querySelector('.lcd-meta__primary').innerText,
-						songArtists:
-							//// There is album title after `—` in a separate element
-							playerBar.querySelector('.lcd-meta__secondary').innerText.split('\n—\n')[0],
-						colors: {
-							background: documentStyle.getPropertyValue('--pageBG'),
-							text: documentStyle.getPropertyValue('--systemPrimary'),
-							link: documentStyle.getPropertyValue('--linkColor'),
-							border: documentStyle.getPropertyValue('--labelDivider')
-						}
-					}
-				}
-			}, injectionResult => {
-				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				const result = injectionResult[0].result
-
-				// console.debug('result = ', result)
-
-				if (result) {
-					let { songTitle, songArtists, colors } = result
-
-					console.debug('songTitle = ', songTitle)
-					console.debug('songArtists = ', songArtists)
-
-					songTitle = clearFeaturing(songTitle)
-
-					const query = `${songTitle} ${songArtists}`
-					console.debug('query = ', query)
-
-					setColors(colors)
-
-					searchLyrics(query)
-				} else {
-					displayBreakdown()
-				}
-			})
-
-			break
-		}
-
-		case 'youtube.com':
-		case 'www.youtube.com': {
-			chrome.scripting.executeScript({
-				target: { tabId: currentTab.id },
-				func: () => {
-					const documentStyle = getComputedStyle(document.documentElement)
-
-					return {
-						videoTitle: document.querySelector('#below #title h1').innerText,
-						channelName: document.querySelector('#below #channel-name').innerText,
-						chapterTitle: document.querySelector('.ytp-chapter-title-content').innerText,
-						colors: {
-							background: documentStyle.getPropertyValue('--yt-spec-base-background'),
-							text: documentStyle.getPropertyValue('--yt-spec-text-primary'),
-							link: documentStyle.getPropertyValue('--yt-spec-call-to-action'),
-							border: documentStyle.getPropertyValue('--yt-spec-10-percent-layer')
-						}
-					}
-				}
-			}, injectionResult => {
-				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				const result = injectionResult[0].result
-
-				// console.debug('result = ', result)
-
-				if (result) {
-					let
-						{ videoTitle, channelName, chapterTitle, colors } = result,
-						songTitile = chapterTitle || videoTitle
-
-					console.debug('videoTitle = ', videoTitle)
-					console.debug('channelName = ', channelName)
-					console.debug('chapterTitle = ', chapterTitle)
-					console.debug('songTitile = ', songTitile)
-
-					//// Remove additional notes from song title
-					songTitile = songTitile.replace(
-						new RegExp(
-							'(?:' +
-								'[([](?:' +
-									'(?:\\w+ )*(?:Video(?: (?:HD|- Official))?|Soundtrack)|' +
-									'From [^)]*|' +
-									'Lyrics|' +
-									'OUT NOW|' +
-									'Single(?: \\d+)?|' +
-									'Премьера (?:клипа|песни|трека)[^)]*' +
-								')[\\])]|' +
-								'\\| (?:' +
-									'Реакция и разбор' +
-								')' +
-							')',
-							'i'
-						),
-						''
-					)
-
-					songTitile = clearFeaturing(songTitile)
-
-					let query = songTitile.includes(' - ') ? songTitile : `${songTitile} ${channelName}`
-
-					console.debug('query = ', query)
-
-					setColors(colors)
-
-					searchLyrics(query)
-				} else {
-					displayBreakdown()
-				}
-			})
-
-			break
-		}
-
-		case 'music.youtube.com': {
-			chrome.scripting.executeScript({
-				target: { tabId: currentTab.id },
-				func: () => {
-					const
-						playerBar = document.querySelector('ytmusic-player-bar'),
-						documentStyle = getComputedStyle(document.documentElement)
-
-					return {
-						songTitle:
-							playerBar.querySelector('.title').innerText,
-						songArtists:
-							//// There is album title after ` • ` in a separate element, and then even a year
-							playerBar.querySelector('.subtitle').innerText.split('\n • \n')[0],
-						colors: {
-							background: getComputedStyle(document.querySelector('body')).backgroundColor,
-							text: documentStyle.getPropertyValue('--yt-spec-text-primary'),
-							link: documentStyle.getPropertyValue('--yt-spec-brand-link-text'),
-							border: getComputedStyle(document.querySelector('#divider')).borderTopColor
-						}
-					}
-				}
-			}, injectionResult => {
-				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				const result = injectionResult[0].result
-
-				// console.debug('result = ', result)
-
-				if (result) {
-					let { songTitle, songArtists, colors } = result
-
-					console.debug('songTitle = ', songTitle)
-					console.debug('songArtists = ', songArtists)
-
-					songTitle = clearFeaturing(songTitle)
-
-					const query = `${songTitle} ${songArtists}`
-					console.debug('query = ', query)
-
-					setColors(colors)
-
-					searchLyrics(query)
-				} else {
-					displayBreakdown()
-				}
-			})
-
-			break
-		}
-
-		case 'genius.com':
-		case 'www.genius.com': {
-			chrome.scripting.executeScript({
-				target: { tabId: currentTab.id },
-				func: () => {
-					const
-						lyricsStyle = getComputedStyle(
-							document.querySelector(
-								// Regular lyrics
-								'[data-lyrics-container="true"],' +
-								// Lyrics for this song have yet to be released
-								'[class^="LyricsPlaceholder__Container-"]'
-							)
-						),
-						contributorsCreditStyle = getComputedStyle(
-							document.querySelector('[class^="ContributorsCreditSong__Label"]')
-						),
-						stickyContributorToolbarStyle = getComputedStyle(
-							document.querySelector('[class*=" StickyContributorToolbar__Container"]')
-						)
-
-					return {
-						songTitle:
-							document.querySelector('[class^="SongHeaderdesktop__Title"]')
-								.innerText,
-						songArtist:
-							document.querySelector('[class*="HeaderArtistAndTracklistdesktop__Artist"]')
-								.innerText,
-						colors: {
-							background: lyricsStyle.backgroundColor,
-							text: lyricsStyle.color,
-							link: contributorsCreditStyle.color,
-							border: stickyContributorToolbarStyle.borderBottomColor
-						}
-					}
-				}
-			}, injectionResult => {
-				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				const result = injectionResult[0].result
-
-				// console.debug('result = ', result)
-
-				if (result) {
-					let { songTitle, songArtist, colors } = result
-
-					console.debug('songTitle = ', songTitle)
-					console.debug('songArtist = ', songArtist)
-
-					setColors(colors)
-
-					searchLyrics(`${songTitle} ${songArtist}`)
-				} else {
-					displayBreakdown()
-				}
-			})
-
-			break
-		}
-
-		case 'shazam.com':
-		case 'www.shazam.com': {
-			chrome.scripting.executeScript({
-				target: { tabId: currentTab.id },
-				func: () => {
-					const header = document.querySelector('[class*=" TrackPageHeader_songDetail_"]')
-
-					return {
-						songTitle: header.querySelector('h1').innerText,
-						songArtist: header.querySelector('h2').innerText,
-						colors: {
-							background:
-								getComputedStyle(
-									document.querySelector('body')
-								).backgroundColor,
-							text:
-								getComputedStyle(
-									document.querySelector(
-										'[class^="pages_container__"] [class*="Text-module_text-black-100"]'
-									)
-								).color,
-							link:
-								getComputedStyle(
-									document.querySelector('[class^="FloatingShazamButton_buttonContainer__"] svg')
-								).fill,
-							border:
-								getComputedStyle(
-									document.querySelector('[class*="SongItem-module_container"]'),
-									':after'
-								).backgroundColor
-						}
-					}
-				}
-			}, injectionResult => {
-				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				const result = injectionResult[0].result
-
-				// console.debug('result = ', result)
-
-				if (result) {
-					let { songTitle, songArtist, colors } = result
-
-					console.debug('songTitle = ', songTitle)
-					console.debug('songArtist = ', songArtist)
-
-					songTitle = clearFeaturing(songTitle)
-					songArtist = songArtist.trim()
-
-					setColors(colors)
-
-					searchLyrics(`${songTitle} ${songArtist}`)
-				} else {
-					displayBreakdown()
-				}
-			})
-
-			break
-		}
-
-		case 'last.fm':
-		case 'www.last.fm': {
-			chrome.scripting.executeScript({
-				target: { tabId: currentTab.id },
-				func: () => {
-					//// There is also a dynamic player at the top of a page (from YouTube or Spotify),
-					//// but we parse only track pages for now.
-					const header = document.querySelector('header')
-
-					return {
-						songTitle: header.querySelector('h1[itemprop="name"]').innerText,
-						songArtist: header.querySelector('[itemprop="byArtist"]').innerText,
-						colors: {
-							background:
-								getComputedStyle(document.querySelector('.page-content')).backgroundColor,
-							text:
-								getComputedStyle(document.querySelector('.page-content')).color,
-							link:
-								getComputedStyle(document.querySelector('.about-artist a')).color,
-							border:
-								getComputedStyle(
-									document.querySelector('.play-this-track-playlink'),
-									':after'
-								).borderBottomColor
-						}
-					}
-				}
-			}, injectionResult => {
-				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				const result = injectionResult[0].result
-
-				// console.debug('result = ', result)
-
-				if (result) {
-					let { songTitle, songArtist, colors } = result
-
-					console.debug('songTitle = ', songTitle)
-					console.debug('songArtist = ', songArtist)
-
-					songTitle = clearFeaturing(songTitle)
-					songArtist = songArtist.trim()
-
-					setColors(colors)
-
-					searchLyrics(`${songTitle} ${songArtist}`)
-				} else {
-					displayBreakdown()
-				}
-			})
-
-			break
-		}
-
-		case 'song.link': {
-			chrome.scripting.executeScript({
-				target: { tabId: currentTab.id },
-				func: () => ({
-					songTitle: document.querySelector('.e12n0mv61').innerText,
-					songArtist: document.querySelector('.e12n0mv60').innerText,
-					colors: {
-						background: getComputedStyle(document.querySelector('.css-1lcypyy')).backgroundColor,
-						text: getComputedStyle(document.querySelector('.css-1lcypyy')).color,
-						link: getComputedStyle(document.querySelector('.css-12zt9a8')).color,
-						border: getComputedStyle(document.querySelector('.css-1lcypyy')).borderColor
+						searchLyrics(query)
+					} else {
+						displayBreakdown()
 					}
 				})
-			}, injectionResult => {
-				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-				const result = injectionResult[0].result
 
-				// console.debug('result = ', result)
+				break
+			}
 
-				if (result) {
-					let { songTitle, songArtist, colors } = result
+			case 'music.yandex.ru': {
+				chrome.scripting.executeScript({
+					target: { tabId: currentTab.id },
+					func: () => {
+						const
+							decoPaneStyle = getComputedStyle(document.querySelector('.deco-pane')),
+							playerControls = document.querySelector('.player-controls__track-container')
 
-					console.debug('songTitle = ', songTitle)
-					console.debug('songArtist = ', songArtist)
+						return {
+							songTitle: playerControls.querySelector('.track__title').innerText,
+							songArtists: playerControls.querySelector('.track__artists').innerText,
+							colors: {
+								background: decoPaneStyle.backgroundColor,
+								text: decoPaneStyle.color,
+								link: getComputedStyle(document.querySelector('.deco-link_muted')).color,
+								border: decoPaneStyle.borderColor
+							}
+						}
+					}
+				}, injectionResult => {
+					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+					const result = injectionResult[0].result
 
-					songTitle = clearFeaturing(songTitle)
+					// console.debug('result = ', result)
 
-					setColors(colors)
+					if (result) {
+						let { songTitle, songArtists, colors } = result
 
-					searchLyrics(`${songTitle} ${songArtist}`)
-				} else {
-					displayBreakdown()
-				}
-			})
+						console.debug('songTitle = ', songTitle)
+						console.debug('songArtists = ', songArtists)
 
-			break
-		}
+						songTitle = clearFeaturing(songTitle)
 
-		default: {
-			loadingNotice.classList.add('hidden')
-			lyricsContainer.classList.add('hidden')
-			otherSearchResultsContainer.classList.add('hidden')
-			notFoundNotice.classList.add('hidden')
-			searchPageLink.classList.add('hidden')
-			breakdownNotice.classList.add('hidden')
+						const query = `${songTitle} ${songArtists}`
+						console.debug('query = ', query)
 
-			switchToSystemTheme()
+						setColors(colors)
 
-			passColorsToParentWindow()
+						searchLyrics(query)
+					} else {
+						displayBreakdown()
+					}
+				})
 
-			notSupportedNotice.querySelector('a.request').href = buildGitHubNewIssueURI(
-				`Please add support of \`${currentTabHostname}\` as a music platform`,
-				"I think it's appropriate for this extension. Thank you."
-			)
+				break
+			}
 
-			notSupportedNotice.classList.remove('hidden')
-			loadForm.classList.remove('hidden')
+			case 'soundcloud.com': {
+				chrome.scripting.executeScript({
+					target: { tabId: currentTab.id },
+					func: () => {
+						const
+							playbackTitleContainer =
+								document.querySelector('.playbackSoundBadge__titleContextContainer')
+
+						return {
+							songTitle:
+								playbackTitleContainer
+									.querySelector('.playbackSoundBadge__title > a > span:not(.sc-visuallyhidden)')
+									.innerText,
+							songArtists:
+								playbackTitleContainer
+									.querySelector(':scope > a')
+									.innerText,
+							colors: {
+								background: getComputedStyle(document.querySelector('body')).backgroundColor,
+								text: getComputedStyle(document.querySelector('.sc-text')).color,
+								link: getComputedStyle(document.querySelector('.playButton')).backgroundColor,
+								border: getComputedStyle(document.querySelector('.sc-border-light-top')).borderColor
+							}
+						}
+					}
+				}, injectionResult => {
+					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+					const result = injectionResult[0].result
+
+					// console.debug('result = ', result)
+
+					if (result) {
+						let { songTitle, songArtists, colors } = result
+
+						console.debug('songTitle = ', songTitle)
+						console.debug('songArtists = ', songArtists)
+
+						songTitle = clearFeaturing(songTitle)
+
+						const query = `${songTitle} ${songArtists}`
+						console.debug('query = ', query)
+
+						setColors(colors)
+
+						searchLyrics(query)
+					} else {
+						displayBreakdown()
+					}
+				})
+
+				break
+			}
+
+			case 'open.spotify.com': {
+				chrome.scripting.executeScript({
+					target: { tabId: currentTab.id },
+					func: () => {
+						const
+							nowPlayingWidget = document.querySelector('[data-testid="now-playing-widget"]'),
+							documentStyle = getComputedStyle(document.body)
+
+						return {
+							songTitle:
+								nowPlayingWidget
+									.querySelector('[data-testid="context-item-link"]')
+									.innerText,
+							songArtists:
+								nowPlayingWidget
+									.querySelector('[data-testid="context-item-info-subtitles"]')
+									.innerText,
+							colors: {
+								background: documentStyle.getPropertyValue('--background-base'),
+								text: documentStyle.getPropertyValue('--text-base'),
+								link: documentStyle.getPropertyValue('--text-bright-accent'),
+								border: documentStyle.getPropertyValue('--decorative-subdued')
+							}
+						}
+					}
+				}, injectionResult => {
+					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+					const result = injectionResult[0].result
+
+					// console.debug('result = ', result)
+
+					if (result) {
+						let { songTitle, songArtists, colors } = result
+
+						console.debug('songTitle = ', songTitle)
+						console.debug('songArtists = ', songArtists)
+
+						songTitle = clearFeaturing(songTitle)
+
+						const query = `${songTitle} ${songArtists}`
+						console.debug('query = ', query)
+
+						setColors(colors)
+
+						searchLyrics(query)
+					} else {
+						displayBreakdown()
+					}
+				})
+
+				break
+			}
+
+			case 'music.apple.com': {
+				chrome.scripting.executeScript({
+					target: { tabId: currentTab.id },
+					func: () => {
+						const
+							playerBar = document.querySelector('.player-bar amp-lcd').shadowRoot,
+							documentStyle = getComputedStyle(document.documentElement)
+
+						return {
+							songTitle:
+								playerBar.querySelector('.lcd-meta__primary').innerText,
+							songArtists:
+								//// There is album title after `—` in a separate element
+								playerBar.querySelector('.lcd-meta__secondary').innerText.split('\n—\n')[0],
+							colors: {
+								background: documentStyle.getPropertyValue('--pageBG'),
+								text: documentStyle.getPropertyValue('--systemPrimary'),
+								link: documentStyle.getPropertyValue('--linkColor'),
+								border: documentStyle.getPropertyValue('--labelDivider')
+							}
+						}
+					}
+				}, injectionResult => {
+					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+					const result = injectionResult[0].result
+
+					// console.debug('result = ', result)
+
+					if (result) {
+						let { songTitle, songArtists, colors } = result
+
+						console.debug('songTitle = ', songTitle)
+						console.debug('songArtists = ', songArtists)
+
+						songTitle = clearFeaturing(songTitle)
+
+						const query = `${songTitle} ${songArtists}`
+						console.debug('query = ', query)
+
+						setColors(colors)
+
+						searchLyrics(query)
+					} else {
+						displayBreakdown()
+					}
+				})
+
+				break
+			}
+
+			case 'youtube.com':
+			case 'www.youtube.com': {
+				chrome.scripting.executeScript({
+					target: { tabId: currentTab.id },
+					func: () => {
+						const documentStyle = getComputedStyle(document.documentElement)
+
+						return {
+							videoTitle: document.querySelector('#below #title h1').innerText,
+							channelName: document.querySelector('#below #channel-name').innerText,
+							chapterTitle: document.querySelector('.ytp-chapter-title-content').innerText,
+							colors: {
+								background: documentStyle.getPropertyValue('--yt-spec-base-background'),
+								text: documentStyle.getPropertyValue('--yt-spec-text-primary'),
+								link: documentStyle.getPropertyValue('--yt-spec-call-to-action'),
+								border: documentStyle.getPropertyValue('--yt-spec-10-percent-layer')
+							}
+						}
+					}
+				}, injectionResult => {
+					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+					const result = injectionResult[0].result
+
+					// console.debug('result = ', result)
+
+					if (result) {
+						let
+							{ videoTitle, channelName, chapterTitle, colors } = result,
+							songTitile = chapterTitle || videoTitle
+
+						console.debug('videoTitle = ', videoTitle)
+						console.debug('channelName = ', channelName)
+						console.debug('chapterTitle = ', chapterTitle)
+						console.debug('songTitile = ', songTitile)
+
+						//// Remove additional notes from song title
+						songTitile = songTitile.replace(
+							new RegExp(
+								'(?:' +
+									'[([](?:' +
+										'(?:\\w+ )*(?:Video(?: (?:HD|- Official))?|Soundtrack)|' +
+										'From [^)]*|' +
+										'Lyrics|' +
+										'OUT NOW|' +
+										'Single(?: \\d+)?|' +
+										'Премьера (?:клипа|песни|трека)[^)]*' +
+									')[\\])]|' +
+									'\\| (?:' +
+										'Реакция и разбор' +
+									')' +
+								')',
+								'i'
+							),
+							''
+						)
+
+						songTitile = clearFeaturing(songTitile)
+
+						let query = songTitile.includes(' - ') ? songTitile : `${songTitile} ${channelName}`
+
+						console.debug('query = ', query)
+
+						setColors(colors)
+
+						searchLyrics(query)
+					} else {
+						displayBreakdown()
+					}
+				})
+
+				break
+			}
+
+			case 'music.youtube.com': {
+				chrome.scripting.executeScript({
+					target: { tabId: currentTab.id },
+					func: () => {
+						const
+							playerBar = document.querySelector('ytmusic-player-bar'),
+							documentStyle = getComputedStyle(document.documentElement)
+
+						return {
+							songTitle:
+								playerBar.querySelector('.title').innerText,
+							songArtists:
+								//// There is album title after ` • ` in a separate element, and then even a year
+								playerBar.querySelector('.subtitle').innerText.split('\n • \n')[0],
+							colors: {
+								background: getComputedStyle(document.querySelector('body')).backgroundColor,
+								text: documentStyle.getPropertyValue('--yt-spec-text-primary'),
+								link: documentStyle.getPropertyValue('--yt-spec-brand-link-text'),
+								border: getComputedStyle(document.querySelector('#divider')).borderTopColor
+							}
+						}
+					}
+				}, injectionResult => {
+					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+					const result = injectionResult[0].result
+
+					// console.debug('result = ', result)
+
+					if (result) {
+						let { songTitle, songArtists, colors } = result
+
+						console.debug('songTitle = ', songTitle)
+						console.debug('songArtists = ', songArtists)
+
+						songTitle = clearFeaturing(songTitle)
+
+						const query = `${songTitle} ${songArtists}`
+						console.debug('query = ', query)
+
+						setColors(colors)
+
+						searchLyrics(query)
+					} else {
+						displayBreakdown()
+					}
+				})
+
+				break
+			}
+
+			case 'genius.com':
+			case 'www.genius.com': {
+				chrome.scripting.executeScript({
+					target: { tabId: currentTab.id },
+					func: () => {
+						const
+							lyricsStyle = getComputedStyle(
+								document.querySelector(
+									// Regular lyrics
+									'[data-lyrics-container="true"],' +
+									// Lyrics for this song have yet to be released
+									'[class^="LyricsPlaceholder__Container-"]'
+								)
+							),
+							contributorsCreditStyle = getComputedStyle(
+								document.querySelector('[class^="ContributorsCreditSong__Label"]')
+							),
+							stickyContributorToolbarStyle = getComputedStyle(
+								document.querySelector('[class*=" StickyContributorToolbar__Container"]')
+							)
+
+						return {
+							songTitle:
+								document.querySelector('[class^="SongHeaderdesktop__Title"]')
+									.innerText,
+							songArtist:
+								document.querySelector('[class*="HeaderArtistAndTracklistdesktop__Artist"]')
+									.innerText,
+							colors: {
+								background: lyricsStyle.backgroundColor,
+								text: lyricsStyle.color,
+								link: contributorsCreditStyle.color,
+								border: stickyContributorToolbarStyle.borderBottomColor
+							}
+						}
+					}
+				}, injectionResult => {
+					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+					const result = injectionResult[0].result
+
+					// console.debug('result = ', result)
+
+					if (result) {
+						let { songTitle, songArtist, colors } = result
+
+						console.debug('songTitle = ', songTitle)
+						console.debug('songArtist = ', songArtist)
+
+						setColors(colors)
+
+						searchLyrics(`${songTitle} ${songArtist}`)
+					} else {
+						displayBreakdown()
+					}
+				})
+
+				break
+			}
+
+			case 'shazam.com':
+			case 'www.shazam.com': {
+				chrome.scripting.executeScript({
+					target: { tabId: currentTab.id },
+					func: () => {
+						const header = document.querySelector('[class*=" TrackPageHeader_songDetail_"]')
+
+						return {
+							songTitle: header.querySelector('h1').innerText,
+							songArtist: header.querySelector('h2').innerText,
+							colors: {
+								background:
+									getComputedStyle(
+										document.querySelector('body')
+									).backgroundColor,
+								text:
+									getComputedStyle(
+										document.querySelector(
+											'[class^="pages_container__"] [class*="Text-module_text-black-100"]'
+										)
+									).color,
+								link:
+									getComputedStyle(
+										document.querySelector('[class^="FloatingShazamButton_buttonContainer__"] svg')
+									).fill,
+								border:
+									getComputedStyle(
+										document.querySelector('[class*="SongItem-module_container"]'),
+										':after'
+									).backgroundColor
+							}
+						}
+					}
+				}, injectionResult => {
+					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+					const result = injectionResult[0].result
+
+					// console.debug('result = ', result)
+
+					if (result) {
+						let { songTitle, songArtist, colors } = result
+
+						console.debug('songTitle = ', songTitle)
+						console.debug('songArtist = ', songArtist)
+
+						songTitle = clearFeaturing(songTitle)
+						songArtist = songArtist.trim()
+
+						setColors(colors)
+
+						searchLyrics(`${songTitle} ${songArtist}`)
+					} else {
+						displayBreakdown()
+					}
+				})
+
+				break
+			}
+
+			case 'last.fm':
+			case 'www.last.fm': {
+				chrome.scripting.executeScript({
+					target: { tabId: currentTab.id },
+					func: () => {
+						//// There is also a dynamic player at the top of a page (from YouTube or Spotify),
+						//// but we parse only track pages for now.
+						const header = document.querySelector('header')
+
+						return {
+							songTitle: header.querySelector('h1[itemprop="name"]').innerText,
+							songArtist: header.querySelector('[itemprop="byArtist"]').innerText,
+							colors: {
+								background:
+									getComputedStyle(document.querySelector('.page-content')).backgroundColor,
+								text:
+									getComputedStyle(document.querySelector('.page-content')).color,
+								link:
+									getComputedStyle(document.querySelector('.about-artist a')).color,
+								border:
+									getComputedStyle(
+										document.querySelector('.play-this-track-playlink'),
+										':after'
+									).borderBottomColor
+							}
+						}
+					}
+				}, injectionResult => {
+					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+					const result = injectionResult[0].result
+
+					// console.debug('result = ', result)
+
+					if (result) {
+						let { songTitle, songArtist, colors } = result
+
+						console.debug('songTitle = ', songTitle)
+						console.debug('songArtist = ', songArtist)
+
+						songTitle = clearFeaturing(songTitle)
+						songArtist = songArtist.trim()
+
+						setColors(colors)
+
+						searchLyrics(`${songTitle} ${songArtist}`)
+					} else {
+						displayBreakdown()
+					}
+				})
+
+				break
+			}
+
+			case 'song.link': {
+				chrome.scripting.executeScript({
+					target: { tabId: currentTab.id },
+					func: () => ({
+						songTitle: document.querySelector('.e12n0mv61').innerText,
+						songArtist: document.querySelector('.e12n0mv60').innerText,
+						colors: {
+							background: getComputedStyle(document.querySelector('.css-1lcypyy')).backgroundColor,
+							text: getComputedStyle(document.querySelector('.css-1lcypyy')).color,
+							link: getComputedStyle(document.querySelector('.css-12zt9a8')).color,
+							border: getComputedStyle(document.querySelector('.css-1lcypyy')).borderColor
+						}
+					})
+				}, injectionResult => {
+					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+					const result = injectionResult[0].result
+
+					// console.debug('result = ', result)
+
+					if (result) {
+						let { songTitle, songArtist, colors } = result
+
+						console.debug('songTitle = ', songTitle)
+						console.debug('songArtist = ', songArtist)
+
+						songTitle = clearFeaturing(songTitle)
+
+						setColors(colors)
+
+						searchLyrics(`${songTitle} ${songArtist}`)
+					} else {
+						displayBreakdown()
+					}
+				})
+
+				break
+			}
+
+			default: {
+				loadingNotice.classList.add('hidden')
+				lyricsContainer.classList.add('hidden')
+				otherSearchResultsContainer.classList.add('hidden')
+				notFoundNotice.classList.add('hidden')
+				searchPageLink.classList.add('hidden')
+				breakdownNotice.classList.add('hidden')
+
+				switchToSystemTheme()
+
+				passColorsToParentWindow()
+
+				notSupportedNotice.querySelector('a.request').href = buildGitHubNewIssueURI(
+					`Please add support of \`${currentTabHostname}\` as a music platform`,
+					"I think it's appropriate for this extension. Thank you."
+				)
+
+				notSupportedNotice.classList.remove('hidden')
+				loadForm.classList.remove('hidden')
+			}
 		}
 	}
+
+	parseAndSearchLyrics()
 })
