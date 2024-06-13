@@ -5,7 +5,7 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.2.0",
-		"@rollup/plugin-commonjs": "^25.0.7",
+		"@rollup/plugin-commonjs": "^26.0.1",
 		"@rollup/plugin-node-resolve": "^15.2.3",
 		"@stylistic/eslint-plugin-js": "^2.1.0",
 		"@stylistic/stylelint-config": "^1.0.1",
