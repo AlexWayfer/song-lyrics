@@ -140,8 +140,11 @@ window.PopupContainer = class {
 
 		element.movingEvent = event => {
 			const
-				newLeft = event.screenX - element.moveScreenPosition.x,
-				newTop = event.screenY - element.moveScreenPosition.y
+				newLeft = event.clientX - element.moveScreenPosition.x,
+				newTop = event.clientY - element.moveScreenPosition.y
+
+			// console.debug('newLeft = ', newLeft)
+			// console.debug('newTop = ', newTop)
 
 			element.style.left = `${newLeft}px`
 			element.style.top = `${newTop}px`
@@ -215,10 +218,20 @@ window.PopupContainer = class {
 		header.addEventListener('mousedown', event => {
 			// console.debug('header mousedown event = ', event)
 
+			const rect = this.element.getBoundingClientRect()
+
 			this.element.moveScreenPosition = {
-				x: event.screenX - this.element.offsetLeft,
-				y: event.screenY - this.element.offsetTop
+				x: event.clientX - rect.left,
+				y: event.clientY - rect.top
 			}
+
+			// console.debug('this.element.moveScreenPosition = ', this.element.moveScreenPosition)
+			// console.debug('this.element.style.left = ', this.element.style.left)
+			// console.debug('this.element.style.top = ', this.element.style.top)
+			// console.debug('this.element.offsetLeft = ', this.element.offsetLeft)
+			// console.debug('this.element.offsetTop = ', this.element.offsetTop)
+
+			this.iframe.style.setProperty('pointer-events', 'none')
 
 			document.addEventListener('mousemove', this.element.movingEvent)
 		})
@@ -227,6 +240,9 @@ window.PopupContainer = class {
 			// console.debug('header mouseup')
 
 			this.element.moveScreenPosition = null
+
+			this.iframe.style.removeProperty('pointer-events')
+
 			document.removeEventListener('mousemove', this.element.movingEvent)
 		})
 
@@ -259,12 +275,6 @@ window.PopupContainer = class {
 					this.element.style.borderColor = event.data.colors.border
 					this.header.style.background = this.element.style.borderColor
 					this.header.style.color = event.data.colors.text
-
-					break
-				case 'mousemove':
-					if (!this.element.moveScreenPosition) return
-
-					this.element.movingEvent(event.data.coordinates)
 
 					break
 				default:

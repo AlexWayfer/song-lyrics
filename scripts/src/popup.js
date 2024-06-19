@@ -57,17 +57,6 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		)
 	}
 
-	if (isInIframe) {
-		document.addEventListener('mousemove', event => {
-			// console.debug('popup mousemove event = ', event)
-
-			window.parent.postMessage(
-				{ name: 'mousemove', coordinates: { screenX: event.screenX, screenY: event.screenY } },
-				currentTab.url
-			)
-		})
-	}
-
 	loadForm.addEventListener('submit', event => {
 		event.preventDefault()
 
