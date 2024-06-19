@@ -3,9 +3,11 @@ import { FastAverageColor } from 'fast-average-color'
 document.addEventListener('DOMContentLoaded', async _event => {
 	const
 		FAC = new FastAverageColor(),
-		currentSettings = (await chrome.storage.sync.get('settings')).settings
+		currentSettings = (await chrome.storage.sync.get('settings')).settings,
+		isInIframe = window !== window.parent
 
 	document.body.classList.add(`${currentSettings.theme}-theme`)
+	if (isInIframe) document.body.classList.add('in-iframe')
 
 	const
 		currentTab = (await chrome.tabs.query({ active: true, currentWindow: true }))[0],
@@ -27,14 +29,44 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		loadForm = document.querySelector('body > form.load'),
 		queryInput = loadForm.querySelector('input[name="query"]')
 
-	document.addEventListener('mousemove', event => {
-		// console.debug('popup mousemove event = ', event)
+	//// Close iframe if openning regular popup
+	if (!isInIframe) {
+		//// https://stackoverflow.com/a/73586624/2630849
+		chrome.scripting.executeScript(
+			{
+				target: { tabId: currentTab.id },
+				files: ['./scripts/compiled/popup_container.js']
+			},
+			() => {
+				// console.debug('popup container script injected')
+				// console.debug('currentTab = ', currentTab)
 
-		window.parent.postMessage(
-			{ name: 'mousemove', coordinates: { screenX: event.screenX, screenY: event.screenY } },
-			currentTab.url
+				chrome.scripting.executeScript({
+					target: { tabId: currentTab.id },
+					func: async () => {
+						// console.debug('chrome.scripting PopupContainer = ', PopupContainer)
+
+						const popupContainer = new window.PopupContainer()
+
+						if (popupContainer.alreadyExist) {
+							popupContainer.remove()
+						}
+					}
+				})
+			}
 		)
-	})
+	}
+
+	if (isInIframe) {
+		document.addEventListener('mousemove', event => {
+			// console.debug('popup mousemove event = ', event)
+
+			window.parent.postMessage(
+				{ name: 'mousemove', coordinates: { screenX: event.screenX, screenY: event.screenY } },
+				currentTab.url
+			)
+		})
+	}
 
 	loadForm.addEventListener('submit', event => {
 		event.preventDefault()
@@ -44,6 +76,39 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 	document.querySelector('button.refresh').addEventListener('click', () => {
 		parseAndSearchLyrics()
+	})
+
+	document.querySelector('button.pin').addEventListener('click', () => {
+		//// https://stackoverflow.com/a/73586624/2630849
+		chrome.scripting.executeScript(
+			{
+				target: { tabId: currentTab.id },
+				files: ['./scripts/compiled/popup_container.js']
+			},
+			() => {
+				// console.debug('popup container script injected')
+				// console.debug('currentTab = ', currentTab)
+
+				chrome.scripting.executeScript(
+					{
+						target: { tabId: currentTab.id },
+						func: async () => {
+							// console.debug('pin script injected')
+							// console.debug('chrome.scripting PopupContainer = ', PopupContainer)
+
+							const popupContainer = new window.PopupContainer()
+
+							await popupContainer.asyncConstructor()
+
+							popupContainer.append()
+						}
+					},
+					() => {
+						window.close()
+					}
+				)
+			}
+		)
 	})
 
 	const passColorsToParentWindow = () => {
@@ -61,7 +126,9 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		// console.debug('bodyStyle = ', bodyStyle)
 		// console.debug('colors = ', colors)
 
-		window.parent.postMessage({ name: 'setColors', colors: colors }, currentTab.url)
+		if (isInIframe) {
+			window.parent.postMessage({ name: 'setColors', colors: colors }, currentTab.url)
+		}
 	}
 
 	const switchToSystemTheme = () => {

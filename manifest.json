@@ -4,7 +4,8 @@
 	"description": "Display current song lyrics for music platforms, such as Spotify, Apple Music, Deezer, YouTube, etc.",
 	"version": "4.0.2",
 	"action": {
-		"popup": "pages/popup.html"
+		"default_title": "View current song lyrics on this site",
+		"default_popup": "pages/popup.html"
 	},
 	"icons": {
 		"16": "images/icons/16.png",

@@ -1,36 +1,3 @@
-chrome.action.onClicked.addListener(async tab => {
-	// console.debug('chrome.action.onClicked')
-
-	//// We can't do it right now
-	// chrome.action.openPopup()
-
-	//// https://stackoverflow.com/a/73586624/2630849
-	chrome.scripting.executeScript(
-		{
-			target: { tabId: tab.id },
-			files: ['./scripts/compiled/popup_container.js']
-		},
-		() => {
-			chrome.scripting.executeScript({
-				target: { tabId: tab.id },
-				func: async () => {
-					// console.debug('chrome.scripting PopupContainer = ', PopupContainer)
-
-					const popupContainer = new window.PopupContainer()
-
-					if (popupContainer.alreadyExist) {
-						popupContainer.remove()
-					} else {
-						await popupContainer.asyncConstructor()
-
-						popupContainer.append()
-					}
-				}
-			})
-		}
-	)
-})
-
 chrome.contextMenus.onClicked.addListener(info => {
 	switch (info.menuItemId) {
 		case 'clear-cache':

@@ -10,6 +10,12 @@ body {
 	margin: 0;
 	word-break: break-word;
 
+	&.in-iframe {
+		button.pin {
+			display: none;
+		}
+	}
+
 	&.light-theme {
 		--background-color: white;
 		--text-color: black;
@@ -59,6 +65,7 @@ body {
 	}
 
 	.lyrics {
+		width: 500px;
 		padding: 0;
 
 		& > * {
@@ -97,20 +104,27 @@ body {
 				}
 
 				& > .right-part {
+					display: flex;
+					flex-direction: column;
+					margin-top: -0.3em;
+
 					button {
-						padding: 0.4em;
+						--svg-size: 1.5em;
+						--size: 2.4em;
+
+						padding: calc((var(--size) - var(--svg-size)) / 2);
+						vertical-align: middle;
 						background: transparent;
 						border: none;
+						cursor: pointer;
 
-						&.refresh {
-							cursor: pointer;
+						svg {
+							width: var(--svg-size);
+							height: var(--svg-size);
+						}
 
-							svg {
-								--size: 1.5em;
-
-								width: var(--size);
-								height: var(--size);
-							}
+						&.pin {
+							--svg-size: 1.2em;
 						}
 					}
 				}
