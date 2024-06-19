@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+## 5.0 (2024-06-20)
+
+*   Return regular popup, but add a pin button to display it as iframe.
+    Now you will always open the default popup window, but you can switch to iframe anytime.
+
+*   Add refresh button for re-parsing song title and artists from a site.
+
+*   Remake iframe moving actions, adopt it for zoomed pages.
+
+*   Remake CSS standard resize to a custom corner.
+
+*   Fix song art sizes.
+
+*   Allow song arts from AWS S3 (`/rapgenius`).
+
 ## 4.0 (2024-06-05)
 
 *   Make popup window as iframe.
