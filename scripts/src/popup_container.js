@@ -26,6 +26,9 @@ window.PopupContainer = class {
 		this.iframe = this.#iframeConstructor()
 		this.element.appendChild(this.iframe)
 
+		this.resizeCorner = this.#resizeCornerConstructor()
+		this.element.appendChild(this.resizeCorner)
+
 		this.#windowMessagesConstructor()
 	}
 
@@ -104,9 +107,9 @@ window.PopupContainer = class {
 		element.style = `
 			display: flex;
 			flex-direction: column;
-			resize: both;
-			overflow: auto;
 			position: fixed;
+			min-width: 400px;
+			min-height: 200px;
 			top: ${top};
 			left: ${left};
 			width: ${width};
@@ -117,26 +120,6 @@ window.PopupContainer = class {
 			user-select: none;
 			z-index: 999999999;
 		`
-
-		const resizeObserver = new ResizeObserver(entries => {
-			// console.debug('entries = ', entries)
-
-			if (this.resizeEvent) clearTimeout(this.resizeEvent)
-
-			this.resizeEvent = setTimeout(() => {
-				const { width, height } = entries[0].contentRect
-
-				// console.debug('width = ', width)
-				// console.debug('height = ', height)
-
-				if (width == 0 && height == 0) return
-
-				// console.debug('rewrite sizes')
-
-				this.#settingsPerHost = { width, height }
-			}, 200)
-		})
-		resizeObserver.observe(element)
 
 		element.movingEvent = event => {
 			const
@@ -150,6 +133,19 @@ window.PopupContainer = class {
 			element.style.top = `${newTop}px`
 
 			this.#settingsPerHost = { left: element.style.left, top: element.style.top }
+		}
+
+		element.resizingEvent = event => {
+			// console.debug('resizingEvent')
+
+			const
+				newWidth = event.clientX - element.resizeScreenPosition.x,
+				newHeight = event.clientY - element.resizeScreenPosition.y
+
+			element.style.width = `${newWidth}px`
+			element.style.height = `${newHeight}px`
+
+			this.#settingsPerHost = { width: newWidth, height: newHeight }
 		}
 
 		return element
@@ -263,6 +259,59 @@ window.PopupContainer = class {
 		return iframe
 	}
 
+	#resizeCornerConstructor() {
+		const resizeCorner = document.createElement('div')
+
+		resizeCorner.style = `
+			position: absolute;
+			bottom: -${this.constructor.#borderWidth};
+			right: -${this.constructor.#borderWidth};
+			--size: 24px;
+			width: var(--size);
+			height: var(--size);
+			padding: 4px;
+			opacity: 0.8;
+			cursor: nwse-resize;
+		`
+
+		resizeCorner.innerHTML = `
+			<svg
+				fill="currentColor"
+				viewBox="0 0 79.124 78.876"
+				style="transform: rotate(90deg);"
+			>
+				<path d="M47.624,0l12.021,9.73L44.5,24.376l10,10l14.661-15.161L79.124,31.5V0H47.624z M24.5,44.376L9.847,59.529L0,47.376v31.5  h31.5l-12.153-9.847L34.5,54.376L24.5,44.376z"/>
+			</svg>
+		`
+
+		resizeCorner.addEventListener('mousedown', event => {
+			// console.debug('resizeCorner mousedown event = ', event)
+
+			const rect = this.element.getBoundingClientRect()
+
+			this.element.resizeScreenPosition = {
+				x: event.clientX - rect.width,
+				y: event.clientY - rect.height
+			}
+
+			this.iframe.style.setProperty('pointer-events', 'none')
+
+			document.addEventListener('mousemove', this.element.resizingEvent)
+		})
+
+		resizeCorner.addEventListener('mouseup', _event => {
+			// console.debug('resizeCorner mouseup')
+
+			this.element.resizeScreenPosition = null
+
+			this.iframe.style.removeProperty('pointer-events')
+
+			document.removeEventListener('mousemove', this.element.resizingEvent)
+		})
+
+		return resizeCorner
+	}
+
 	#windowMessagesConstructor() {
 		window.popupMessageListener = event => {
 			// console.debug('message event = ', event)
@@ -272,7 +321,9 @@ window.PopupContainer = class {
 
 			switch (event.data.name) {
 				case 'setColors':
-					this.element.style.borderColor = event.data.colors.border
+					this.element.style.borderColor =
+						this.resizeCorner.style.backgroundColor =
+							event.data.colors.border
 					this.header.style.background = this.element.style.borderColor
 					this.header.style.color = event.data.colors.text
 

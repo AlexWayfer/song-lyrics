@@ -11,8 +11,12 @@ body {
 	word-break: break-word;
 
 	&.in-iframe {
-		button.pin {
-			display: none;
+		.lyrics {
+			min-width: auto;
+
+			button.pin {
+				display: none;
+			}
 		}
 	}
 
