@@ -32,7 +32,8 @@
 	],
 	"host_permissions": [
 		"https://*.genius.com/*",
-		"https://*.rapgenius.com/*"
+		"https://*.rapgenius.com/*",
+		"https://s3.amazonaws.com/rapgenius/*"
 	],
 	"web_accessible_resources": [
 		{
