@@ -2,7 +2,7 @@
 	"manifest_version": 3,
 	"name": "Song Lyrics",
 	"description": "Display current song lyrics for music platforms, such as Spotify, Apple Music, Deezer, YouTube, etc.",
-	"version": "4.0.2",
+	"version": "5.0",
 	"action": {
 		"default_title": "View current song lyrics on this site",
 		"default_popup": "pages/popup.html"
