@@ -193,24 +193,35 @@ body {
 
 		& input,
 		& button,
+		& label,
 		& legend {
 			font-size: 16px;
 		}
 
 		> fieldset {
-			display: flex;
 			padding: 0.2em 0.4em 0.4em;
 
-			& input[name="query"] {
-				flex-grow: 1;
-				padding: 0.4em 0.8em;
-				border-top-right-radius: 0;
-				border-bottom-right-radius: 0;
-			}
+			& label {
+				display: inline-block;
+				padding: 0.2em 0.4em;
+				white-space: nowrap;
+				user-select: none;
 
-			& button {
-				border-top-left-radius: 0;
-				border-bottom-left-radius: 0;
+				&.query {
+					display: flex;
+
+					& input[type="text"] {
+						flex-grow: 1;
+						padding: 0.4em 0.8em;
+						border-top-right-radius: 0;
+						border-bottom-right-radius: 0;
+					}
+
+					& button {
+						border-top-left-radius: 0;
+						border-bottom-left-radius: 0;
+					}
+				}
 			}
 		}
 	}

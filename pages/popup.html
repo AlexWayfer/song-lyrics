@@ -122,7 +122,14 @@
 	<fieldset>
 		<legend>Refine query</legend>
 
-		<input type="text" name="query" required />
-		<button type="submit">Load</button>
+		<label class="query">
+			<input type="text" required />
+			<button type="submit">Load</button>
+		</label>
+
+		<label class="remove-mix hidden">
+			<input type="checkbox" />
+			Remove "(Mix)" from the query
+		</label>
 	</fieldset>
 </form>

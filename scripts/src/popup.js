@@ -27,7 +27,9 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		searchPageLink = document.querySelector('a.search-page'),
 		breakdownNotice = document.querySelector('body > .breakdown'),
 		loadForm = document.querySelector('body > form.load'),
-		queryInput = loadForm.querySelector('input[name="query"]')
+		queryInput = loadForm.querySelector('label.query input[type="text"]'),
+		removeMixLabel = loadForm.querySelector('label.remove-mix'),
+		removeMixInput = removeMixLabel.querySelector('input[type="checkbox"]')
 
 	//// Close iframe if openning regular popup
 	if (!isInIframe) {
@@ -60,7 +62,28 @@ document.addEventListener('DOMContentLoaded', async _event => {
 	loadForm.addEventListener('submit', event => {
 		event.preventDefault()
 
+		if (!loadForm.removeMixSubmitting) {
+			removeMixInput.originalQuery = removeMixInput.cleanQuery = null
+			removeMixInput.checked = false
+		}
+
+		loadForm.removeMixSubmitting = false
+
 		searchLyrics(queryInput.value)
+	})
+
+	removeMixInput.addEventListener('change', event => {
+		if (!removeMixInput.originalQuery) {
+			removeMixInput.originalQuery = queryInput.value
+			removeMixInput.cleanQuery = queryInput.value.replace(/ \([^)]+ (?:Re)?mix\)/i, '')
+		}
+
+		queryInput.value =
+			event.target.checked ? removeMixInput.cleanQuery : removeMixInput.originalQuery
+
+		removeMixInput.form.removeMixSubmitting = true
+
+		removeMixInput.form.requestSubmit()
 	})
 
 	document.querySelector('button.refresh').addEventListener('click', () => {
@@ -399,6 +422,8 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		queryInput.value = query
 		loadingQueryText.innerText = query
 		searchPageLink.href = `https://genius.com/search?q=${encodedQuery.replace(/[()]/g, '')}`
+
+		removeMixLabel.classList.toggle('hidden', !queryInput.value)
 
 		const
 			searchesCache = await readCache('searches'),
