@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		const
 			cache = await getCache(),
 			cachedType = cache[type],
-			cacheTTL = 24 * 60 * 60 * 1000 //// 24 hours
+			cacheTTL = 7 * 24 * 60 * 60 * 1000 //// 7 days
 
 		for (const key in cachedType) {
 			//// https://bugs.chromium.org/p/chromium/issues/detail?id=1472588
