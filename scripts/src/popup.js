@@ -62,13 +62,6 @@ document.addEventListener('DOMContentLoaded', async _event => {
 	loadForm.addEventListener('submit', event => {
 		event.preventDefault()
 
-		if (!loadForm.removeMixSubmitting) {
-			removeMixInput.originalQuery = removeMixInput.cleanQuery = null
-			removeMixInput.checked = false
-		}
-
-		loadForm.removeMixSubmitting = false
-
 		searchLyrics(queryInput.value)
 	})
 
@@ -422,6 +415,13 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		queryInput.value = query
 		loadingQueryText.innerText = query
 		searchPageLink.href = `https://genius.com/search?q=${encodedQuery.replace(/[()]/g, '')}`
+
+		if (!loadForm.removeMixSubmitting) {
+			removeMixInput.originalQuery = removeMixInput.cleanQuery = null
+			removeMixInput.checked = false
+		}
+
+		loadForm.removeMixSubmitting = false
 
 		removeMixLabel.classList.toggle('hidden', !queryInput.value)
 
