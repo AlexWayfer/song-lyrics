@@ -65,16 +65,20 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		searchLyrics()
 	})
 
+	const removeMixRegexp = / \([^)]+ (?:Re)?mix\)/i
+
 	removeMixInput.addEventListener('change', event => {
 		if (!removeMixInput.originalQuery) {
 			removeMixInput.originalQuery = queryInput.value
-			removeMixInput.cleanQuery = queryInput.value.replace(/ \([^)]+ (?:Re)?mix\)/i, '')
+			removeMixInput.cleanQuery = queryInput.value.replace(removeMixRegexp, '')
 		}
 
 		queryInput.value =
 			event.target.checked ? removeMixInput.cleanQuery : removeMixInput.originalQuery
 
 		removeMixInput.form.removeMixSubmitting = true
+
+		queryInput.manualInput = true
 
 		removeMixInput.form.requestSubmit()
 	})
@@ -465,13 +469,12 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		searchPageLink.href = `https://genius.com/search?q=${encodedQuery.replace(/[()]/g, '')}`
 
 		if (!loadForm.removeMixSubmitting) {
+			removeMixLabel.classList.toggle('hidden', !query.match(removeMixRegexp))
 			removeMixInput.originalQuery = removeMixInput.cleanQuery = null
 			removeMixInput.checked = false
 		}
 
 		loadForm.removeMixSubmitting = false
-
-		removeMixLabel.classList.toggle('hidden', !queryInput.value)
 
 		const
 			searchesCache = await readCache('searches'),
