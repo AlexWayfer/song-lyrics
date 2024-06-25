@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 	document.querySelector('button.refresh').addEventListener('click', () => {
 		queryInput.manualInput = false
 
-		parseAndSearchLyrics()
+		parseAndSearchLyrics({ forced: true })
 	})
 
 	document.querySelector('button.pin').addEventListener('click', () => {
@@ -1115,13 +1115,13 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		queryInput.manualInput = true
 	})
 
-	const parseAndSearchLyrics = async () => {
+	const parseAndSearchLyrics = async ({ forced } = { forced: false }) => {
 		const parsedQuery = await parseLyricsQueryAndSetColors()
 
 		// console.debug('parsedQuery = ', parsedQuery)
 		// console.debug('queryInput.value = ', queryInput.value)
 
-		if (parsedQuery == queryInput.value) return
+		if (!forced && parsedQuery == queryInput.value) return
 
 		queryInput.value = parsedQuery
 
