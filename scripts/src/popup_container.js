@@ -42,6 +42,10 @@ window.PopupContainer = class {
 		return
 	}
 
+	clearSettingsPerHost() {
+		this.#settings = { [window.location.host]: {} }
+	}
+
 	get #settings() {
 		return (async () => {
 			const popupSettings = (await chrome.storage.local.get({ popupSettings: {} })).popupSettings
