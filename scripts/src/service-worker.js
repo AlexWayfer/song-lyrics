@@ -1,11 +1,12 @@
 chrome.contextMenus.onClicked.addListener(async info => {
 	switch (info.menuItemId) {
-		case 'clear-cache':
+		case 'clear-cache': {
 			chrome.storage.local.remove('cache')
 
 			break
+		}
 
-		case 'clear-iframe-settings':
+		case 'clear-iframe-settings': {
 			const
 				currentTab = (await chrome.tabs.query({ active: true, currentWindow: true }))[0]
 
@@ -37,8 +38,11 @@ chrome.contextMenus.onClicked.addListener(async info => {
 			)
 
 			break
-		default:
+		}
+
+		default: {
 			console.error('Unknown context menu clicked', info)
+		}
 	}
 })
 

@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 		breakdownNotice.querySelector('a.report').href = buildGitHubNewIssueURI(
 			`Please fix support of \`${currentTabHostname}\``,
-			"There was an unexpected error. Thank you."
+			'There was an unexpected error. Thank you.'
 		)
 
 		breakdownNotice.classList.remove('hidden')
@@ -540,8 +540,6 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 					return null
 				}
-
-				break
 			}
 
 			case 'music.yandex.ru': {
@@ -584,8 +582,6 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 					return null
 				}
-
-				break
 			}
 
 			case 'soundcloud.com': {
@@ -634,8 +630,6 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 					return null
 				}
-
-				break
 			}
 
 			case 'open.spotify.com': {
@@ -684,8 +678,6 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 					return null
 				}
-
-				break
 			}
 
 			case 'music.apple.com': {
@@ -731,8 +723,6 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 					return null
 				}
-
-				break
 			}
 
 			case 'youtube.com':
@@ -802,8 +792,6 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 					return null
 				}
-
-				break
 			}
 
 			case 'music.youtube.com': {
@@ -849,8 +837,6 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 					return null
 				}
-
-				break
 			}
 
 			case 'genius.com':
@@ -910,8 +896,6 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 					return null
 				}
-
-				break
 			}
 
 			case 'shazam.com':
@@ -968,8 +952,6 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 					return null
 				}
-
-				break
 			}
 
 			case 'last.fm':
@@ -1020,8 +1002,6 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 					return null
 				}
-
-				break
 			}
 
 			case 'song.link': {
@@ -1058,8 +1038,6 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 					return null
 				}
-
-				break
 			}
 
 			default: {
