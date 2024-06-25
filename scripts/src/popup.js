@@ -397,6 +397,8 @@ document.addEventListener('DOMContentLoaded', async _event => {
 	}
 
 	const searchLyrics = async query => {
+		console.debug('searchLyrics call')
+
 		captchaNotice.classList.add('hidden')
 		notFoundNotice.classList.add('hidden')
 		notSupportedNotice.classList.add('hidden')
@@ -407,8 +409,6 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 		loadForm.classList.remove('hidden')
 		loadingNotice.classList.remove('hidden')
-
-		query = query.trim()
 
 		const encodedQuery = encodeURIComponent(query)
 
@@ -479,11 +479,21 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		return text.replace(/ [([]?(?:f(ea)?t|prod)\.? [^()[\]]+[)\]]?/, ' ')
 	}
 
-	const parseAndSearchLyrics = () => {
+	const buildQuery = (songTitle, songArtists) => {
+		const query = `${clearFeaturing(songTitle)} ${songArtists.trim()}`.trim()
+
+		// console.debug('query = ', query)
+
+		return query
+	}
+
+	const parseLyricsQuery = async () => {
+		// console.debug('parseLyricsQuery call')
+
 		switch (currentTabHostname) {
 			case 'deezer.com':
 			case 'www.deezer.com': {
-				chrome.scripting.executeScript({
+				let injectionResult = await chrome.scripting.executeScript({
 					target: { tabId: currentTab.id },
 					func: () => {
 						const
@@ -501,38 +511,36 @@ document.addEventListener('DOMContentLoaded', async _event => {
 							}
 						}
 					}
-				}, injectionResult => {
-					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-					const result = injectionResult[0].result
-
-					// console.debug('result = ', result)
-
-					if (result) {
-						let { songTitle, songArtists, colors } = result
-
-						console.debug('songTitle = ', songTitle)
-						console.debug('songArtists = ', songArtists)
-
-						songTitle = clearFeaturing(songTitle)
-						//// Take only the first artist, second can be from the featuring
-						let songArtist = songArtists.split(', ', 2)[0]
-
-						const query = `${songTitle} ${songArtist}`
-						console.debug('query = ', query)
-
-						setColors(colors)
-
-						searchLyrics(query)
-					} else {
-						displayBreakdown()
-					}
 				})
+
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				const result = injectionResult[0].result
+
+				// console.debug('result = ', result)
+
+				if (result) {
+					let { songTitle, songArtists, colors } = result
+
+					// console.debug('songTitle = ', songTitle)
+					// console.debug('songArtists = ', songArtists)
+
+					//// Take only the first artist, second can be from the featuring
+					let songArtist = songArtists.split(', ', 2)[0]
+
+					setColors(colors)
+
+					return buildQuery(songTitle, songArtist)
+				} else {
+					displayBreakdown()
+
+					return null
+				}
 
 				break
 			}
 
 			case 'music.yandex.ru': {
-				chrome.scripting.executeScript({
+				const injectionResult = await chrome.scripting.executeScript({
 					target: { tabId: currentTab.id },
 					func: () => {
 						const
@@ -550,36 +558,33 @@ document.addEventListener('DOMContentLoaded', async _event => {
 							}
 						}
 					}
-				}, injectionResult => {
-					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-					const result = injectionResult[0].result
-
-					// console.debug('result = ', result)
-
-					if (result) {
-						let { songTitle, songArtists, colors } = result
-
-						console.debug('songTitle = ', songTitle)
-						console.debug('songArtists = ', songArtists)
-
-						songTitle = clearFeaturing(songTitle)
-
-						const query = `${songTitle} ${songArtists}`
-						console.debug('query = ', query)
-
-						setColors(colors)
-
-						searchLyrics(query)
-					} else {
-						displayBreakdown()
-					}
 				})
+
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				const result = injectionResult[0].result
+
+				// console.debug('result = ', result)
+
+				if (result) {
+					let { songTitle, songArtists, colors } = result
+
+					// console.debug('songTitle = ', songTitle)
+					// console.debug('songArtists = ', songArtists)
+
+					setColors(colors)
+
+					return buildQuery(songTitle, songArtists)
+				} else {
+					displayBreakdown()
+
+					return null
+				}
 
 				break
 			}
 
 			case 'soundcloud.com': {
-				chrome.scripting.executeScript({
+				const injectionResult = await chrome.scripting.executeScript({
 					target: { tabId: currentTab.id },
 					func: () => {
 						const
@@ -603,36 +608,33 @@ document.addEventListener('DOMContentLoaded', async _event => {
 							}
 						}
 					}
-				}, injectionResult => {
-					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-					const result = injectionResult[0].result
-
-					// console.debug('result = ', result)
-
-					if (result) {
-						let { songTitle, songArtists, colors } = result
-
-						console.debug('songTitle = ', songTitle)
-						console.debug('songArtists = ', songArtists)
-
-						songTitle = clearFeaturing(songTitle)
-
-						const query = `${songTitle} ${songArtists}`
-						console.debug('query = ', query)
-
-						setColors(colors)
-
-						searchLyrics(query)
-					} else {
-						displayBreakdown()
-					}
 				})
+
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				const result = injectionResult[0].result
+
+				// console.debug('result = ', result)
+
+				if (result) {
+					let { songTitle, songArtists, colors } = result
+
+					// console.debug('songTitle = ', songTitle)
+					// console.debug('songArtists = ', songArtists)
+
+					setColors(colors)
+
+					return buildQuery(songTitle, songArtists)
+				} else {
+					displayBreakdown()
+
+					return null
+				}
 
 				break
 			}
 
 			case 'open.spotify.com': {
-				chrome.scripting.executeScript({
+				const injectionResult = await chrome.scripting.executeScript({
 					target: { tabId: currentTab.id },
 					func: () => {
 						const
@@ -656,36 +658,33 @@ document.addEventListener('DOMContentLoaded', async _event => {
 							}
 						}
 					}
-				}, injectionResult => {
-					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-					const result = injectionResult[0].result
-
-					// console.debug('result = ', result)
-
-					if (result) {
-						let { songTitle, songArtists, colors } = result
-
-						console.debug('songTitle = ', songTitle)
-						console.debug('songArtists = ', songArtists)
-
-						songTitle = clearFeaturing(songTitle)
-
-						const query = `${songTitle} ${songArtists}`
-						console.debug('query = ', query)
-
-						setColors(colors)
-
-						searchLyrics(query)
-					} else {
-						displayBreakdown()
-					}
 				})
+
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				const result = injectionResult[0].result
+
+				// console.debug('result = ', result)
+
+				if (result) {
+					let { songTitle, songArtists, colors } = result
+
+					// console.debug('songTitle = ', songTitle)
+					// console.debug('songArtists = ', songArtists)
+
+					setColors(colors)
+
+					return buildQuery(songTitle, songArtists)
+				} else {
+					displayBreakdown()
+
+					return null
+				}
 
 				break
 			}
 
 			case 'music.apple.com': {
-				chrome.scripting.executeScript({
+				const injectionResult = await chrome.scripting.executeScript({
 					target: { tabId: currentTab.id },
 					func: () => {
 						const
@@ -706,37 +705,34 @@ document.addEventListener('DOMContentLoaded', async _event => {
 							}
 						}
 					}
-				}, injectionResult => {
-					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-					const result = injectionResult[0].result
-
-					// console.debug('result = ', result)
-
-					if (result) {
-						let { songTitle, songArtists, colors } = result
-
-						console.debug('songTitle = ', songTitle)
-						console.debug('songArtists = ', songArtists)
-
-						songTitle = clearFeaturing(songTitle)
-
-						const query = `${songTitle} ${songArtists}`
-						console.debug('query = ', query)
-
-						setColors(colors)
-
-						searchLyrics(query)
-					} else {
-						displayBreakdown()
-					}
 				})
+
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				const result = injectionResult[0].result
+
+				// console.debug('result = ', result)
+
+				if (result) {
+					let { songTitle, songArtists, colors } = result
+
+					// console.debug('songTitle = ', songTitle)
+					// console.debug('songArtists = ', songArtists)
+
+					setColors(colors)
+
+					return buildQuery(songTitle, songArtists)
+				} else {
+					displayBreakdown()
+
+					return null
+				}
 
 				break
 			}
 
 			case 'youtube.com':
 			case 'www.youtube.com': {
-				chrome.scripting.executeScript({
+				const injectionResult = await chrome.scripting.executeScript({
 					target: { tabId: currentTab.id },
 					func: () => {
 						const documentStyle = getComputedStyle(document.documentElement)
@@ -753,62 +749,60 @@ document.addEventListener('DOMContentLoaded', async _event => {
 							}
 						}
 					}
-				}, injectionResult => {
-					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-					const result = injectionResult[0].result
-
-					// console.debug('result = ', result)
-
-					if (result) {
-						let
-							{ videoTitle, channelName, chapterTitle, colors } = result,
-							songTitile = chapterTitle || videoTitle
-
-						console.debug('videoTitle = ', videoTitle)
-						console.debug('channelName = ', channelName)
-						console.debug('chapterTitle = ', chapterTitle)
-						console.debug('songTitile = ', songTitile)
-
-						//// Remove additional notes from song title
-						songTitile = songTitile.replace(
-							new RegExp(
-								'(?:' +
-									'[([](?:' +
-										'(?:\\w+ )*(?:Video(?: (?:HD|- Official))?|Soundtrack)|' +
-										'From [^)]*|' +
-										'Lyrics|' +
-										'OUT NOW|' +
-										'Single(?: \\d+)?|' +
-										'Премьера (?:клипа|песни|трека)[^)]*' +
-									')[\\])]|' +
-									'\\| (?:' +
-										'Реакция и разбор' +
-									')' +
-								')',
-								'i'
-							),
-							''
-						)
-
-						songTitile = clearFeaturing(songTitile)
-
-						let query = songTitile.includes(' - ') ? songTitile : `${songTitile} ${channelName}`
-
-						console.debug('query = ', query)
-
-						setColors(colors)
-
-						searchLyrics(query)
-					} else {
-						displayBreakdown()
-					}
 				})
+
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				const result = injectionResult[0].result
+
+				// console.debug('result = ', result)
+
+				if (result) {
+					let
+						{ videoTitle, channelName, chapterTitle, colors } = result,
+						songTitile = chapterTitle || videoTitle
+
+					// console.debug('videoTitle = ', videoTitle)
+					// console.debug('channelName = ', channelName)
+					// console.debug('chapterTitle = ', chapterTitle)
+					// console.debug('songTitile = ', songTitile)
+
+					//// Remove additional notes from song title
+					songTitile = songTitile.replace(
+						new RegExp(
+							'(?:' +
+								'[([](?:' +
+									'(?:\\w+ )*(?:Video(?: (?:HD|- Official))?|Soundtrack)|' +
+									'From [^)]*|' +
+									'Lyrics|' +
+									'OUT NOW|' +
+									'Single(?: \\d+)?|' +
+									'Премьера (?:клипа|песни|трека)[^)]*' +
+								')[\\])]|' +
+								'\\| (?:' +
+									'Реакция и разбор' +
+								')' +
+							')',
+							'i'
+						),
+						''
+					)
+
+					let songArtists = songTitile.includes(' - ') ? '' : channelName
+
+					setColors(colors)
+
+					return buildQuery(songTitle, songArtists)
+				} else {
+					displayBreakdown()
+
+					return null
+				}
 
 				break
 			}
 
 			case 'music.youtube.com': {
-				chrome.scripting.executeScript({
+				const injectionResult = await chrome.scripting.executeScript({
 					target: { tabId: currentTab.id },
 					func: () => {
 						const
@@ -829,37 +823,34 @@ document.addEventListener('DOMContentLoaded', async _event => {
 							}
 						}
 					}
-				}, injectionResult => {
-					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-					const result = injectionResult[0].result
-
-					// console.debug('result = ', result)
-
-					if (result) {
-						let { songTitle, songArtists, colors } = result
-
-						console.debug('songTitle = ', songTitle)
-						console.debug('songArtists = ', songArtists)
-
-						songTitle = clearFeaturing(songTitle)
-
-						const query = `${songTitle} ${songArtists}`
-						console.debug('query = ', query)
-
-						setColors(colors)
-
-						searchLyrics(query)
-					} else {
-						displayBreakdown()
-					}
 				})
+
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				const result = injectionResult[0].result
+
+				// console.debug('result = ', result)
+
+				if (result) {
+					let { songTitle, songArtists, colors } = result
+
+					// console.debug('songTitle = ', songTitle)
+					// console.debug('songArtists = ', songArtists)
+
+					setColors(colors)
+
+					return buildQuery(songTitle, songArtists)
+				} else {
+					displayBreakdown()
+
+					return null
+				}
 
 				break
 			}
 
 			case 'genius.com':
 			case 'www.genius.com': {
-				chrome.scripting.executeScript({
+				const injectionResult = await chrome.scripting.executeScript({
 					target: { tabId: currentTab.id },
 					func: () => {
 						const
@@ -893,32 +884,34 @@ document.addEventListener('DOMContentLoaded', async _event => {
 							}
 						}
 					}
-				}, injectionResult => {
-					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-					const result = injectionResult[0].result
-
-					// console.debug('result = ', result)
-
-					if (result) {
-						let { songTitle, songArtist, colors } = result
-
-						console.debug('songTitle = ', songTitle)
-						console.debug('songArtist = ', songArtist)
-
-						setColors(colors)
-
-						searchLyrics(`${songTitle} ${songArtist}`)
-					} else {
-						displayBreakdown()
-					}
 				})
+
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				const result = injectionResult[0].result
+
+				// console.debug('result = ', result)
+
+				if (result) {
+					let { songTitle, songArtist, colors } = result
+
+					// console.debug('songTitle = ', songTitle)
+					// console.debug('songArtist = ', songArtist)
+
+					setColors(colors)
+
+					return buildQuery(songTitle, songArtist)
+				} else {
+					displayBreakdown()
+
+					return null
+				}
 
 				break
 			}
 
 			case 'shazam.com':
 			case 'www.shazam.com': {
-				chrome.scripting.executeScript({
+				const injectionResult = await chrome.scripting.executeScript({
 					target: { tabId: currentTab.id },
 					func: () => {
 						const header = document.querySelector('[class*=" TrackPageHeader_songDetail_"]')
@@ -949,35 +942,34 @@ document.addEventListener('DOMContentLoaded', async _event => {
 							}
 						}
 					}
-				}, injectionResult => {
-					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-					const result = injectionResult[0].result
-
-					// console.debug('result = ', result)
-
-					if (result) {
-						let { songTitle, songArtist, colors } = result
-
-						console.debug('songTitle = ', songTitle)
-						console.debug('songArtist = ', songArtist)
-
-						songTitle = clearFeaturing(songTitle)
-						songArtist = songArtist.trim()
-
-						setColors(colors)
-
-						searchLyrics(`${songTitle} ${songArtist}`)
-					} else {
-						displayBreakdown()
-					}
 				})
+
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				const result = injectionResult[0].result
+
+				// console.debug('result = ', result)
+
+				if (result) {
+					let { songTitle, songArtist, colors } = result
+
+					// console.debug('songTitle = ', songTitle)
+					// console.debug('songArtist = ', songArtist)
+
+					setColors(colors)
+
+					return buildQuery(songTitle, songArtist)
+				} else {
+					displayBreakdown()
+
+					return null
+				}
 
 				break
 			}
 
 			case 'last.fm':
 			case 'www.last.fm': {
-				chrome.scripting.executeScript({
+				const injectionResult = await chrome.scripting.executeScript({
 					target: { tabId: currentTab.id },
 					func: () => {
 						//// There is also a dynamic player at the top of a page (from YouTube or Spotify),
@@ -1002,34 +994,33 @@ document.addEventListener('DOMContentLoaded', async _event => {
 							}
 						}
 					}
-				}, injectionResult => {
-					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-					const result = injectionResult[0].result
-
-					// console.debug('result = ', result)
-
-					if (result) {
-						let { songTitle, songArtist, colors } = result
-
-						console.debug('songTitle = ', songTitle)
-						console.debug('songArtist = ', songArtist)
-
-						songTitle = clearFeaturing(songTitle)
-						songArtist = songArtist.trim()
-
-						setColors(colors)
-
-						searchLyrics(`${songTitle} ${songArtist}`)
-					} else {
-						displayBreakdown()
-					}
 				})
+
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				const result = injectionResult[0].result
+
+				// console.debug('result = ', result)
+
+				if (result) {
+					let { songTitle, songArtist, colors } = result
+
+					// console.debug('songTitle = ', songTitle)
+					// console.debug('songArtist = ', songArtist)
+
+					setColors(colors)
+
+					return buildQuery(songTitle, songArtist)
+				} else {
+					displayBreakdown()
+
+					return null
+				}
 
 				break
 			}
 
 			case 'song.link': {
-				chrome.scripting.executeScript({
+				const injectionResult = await chrome.scripting.executeScript({
 					target: { tabId: currentTab.id },
 					func: () => ({
 						songTitle: document.querySelector('.e12n0mv61').innerText,
@@ -1041,27 +1032,27 @@ document.addEventListener('DOMContentLoaded', async _event => {
 							border: getComputedStyle(document.querySelector('.css-1lcypyy')).borderColor
 						}
 					})
-				}, injectionResult => {
-					//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
-					const result = injectionResult[0].result
-
-					// console.debug('result = ', result)
-
-					if (result) {
-						let { songTitle, songArtist, colors } = result
-
-						console.debug('songTitle = ', songTitle)
-						console.debug('songArtist = ', songArtist)
-
-						songTitle = clearFeaturing(songTitle)
-
-						setColors(colors)
-
-						searchLyrics(`${songTitle} ${songArtist}`)
-					} else {
-						displayBreakdown()
-					}
 				})
+
+				//// https://developer.chrome.com/docs/extensions/reference/scripting/#type-InjectionResult
+				const result = injectionResult[0].result
+
+				// console.debug('result = ', result)
+
+				if (result) {
+					let { songTitle, songArtist, colors } = result
+
+					console.debug('songTitle = ', songTitle)
+					console.debug('songArtist = ', songArtist)
+
+					setColors(colors)
+
+					return buildQuery(songTitle, songArtist)
+				} else {
+					displayBreakdown()
+
+					return null
+				}
 
 				break
 			}
@@ -1085,9 +1076,34 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 				notSupportedNotice.classList.remove('hidden')
 				loadForm.classList.remove('hidden')
+
+				return null
 			}
 		}
 	}
 
-	parseAndSearchLyrics()
+	const parseAndSearchLyrics = async () => {
+		const parsedQuery = await parseLyricsQuery()
+
+		// console.debug('parsedQuery = ', parsedQuery)
+		// console.debug('queryInput.value = ', queryInput.value)
+
+		if (parsedQuery == queryInput.value) return
+
+		searchLyrics(parsedQuery)
+	}
+
+	await parseAndSearchLyrics()
+
+	//// Recursive `setTimeout` instead of `setInterval` to wait loading time
+	//// https://developer.mozilla.org/en-US/docs/Web/API/setInterval#ensure_that_execution_duration_is_shorter_than_interval_frequency
+	const watchLyricsQuery = () => {
+		setTimeout(async () => {
+			await parseAndSearchLyrics()
+
+			watchLyricsQuery()
+		}, 1000)
+	}
+
+	watchLyricsQuery()
 })
