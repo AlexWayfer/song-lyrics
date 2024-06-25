@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 	loadForm.addEventListener('submit', event => {
 		event.preventDefault()
 
-		searchLyrics(queryInput.value)
+		searchLyrics()
 	})
 
 	removeMixInput.addEventListener('change', event => {
@@ -95,15 +95,17 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			() => {
 				// console.debug('popup container script injected')
 				// console.debug('currentTab = ', currentTab)
+				// console.debug('queryInput.manualInput = ', queryInput.manualInput)
 
 				chrome.scripting.executeScript(
 					{
 						target: { tabId: currentTab.id },
-						func: async () => {
+						args: [queryInput.value, queryInput.manualInput],
+						func: async (initialQuery, manualInput) => {
 							// console.debug('pin script injected')
 							// console.debug('chrome.scripting PopupContainer = ', PopupContainer)
 
-							const popupContainer = new window.PopupContainer()
+							const popupContainer = new window.PopupContainer(initialQuery, manualInput)
 
 							await popupContainer.asyncConstructor()
 
@@ -398,7 +400,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		searchPageLink.classList.remove('hidden')
 	}
 
-	const searchLyrics = async query => {
+	const searchLyrics = async () => {
 		console.debug('searchLyrics call')
 
 		captchaNotice.classList.add('hidden')
@@ -412,9 +414,10 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		loadForm.classList.remove('hidden')
 		loadingNotice.classList.remove('hidden')
 
-		const encodedQuery = encodeURIComponent(query)
+		const
+			query = queryInput.value,
+			encodedQuery = encodeURIComponent(query)
 
-		queryInput.value = query
 		loadingQueryText.innerText = query
 		searchPageLink.href = `https://genius.com/search?q=${encodedQuery.replace(/[()]/g, '')}`
 
@@ -489,8 +492,8 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		return query
 	}
 
-	const parseLyricsQuery = async () => {
-		// console.debug('parseLyricsQuery call')
+	const parseLyricsQueryAndSetColors = async () => {
+		// console.debug('parseLyricsQueryAndSetColors call')
 
 		switch (currentTabHostname) {
 			case 'deezer.com':
@@ -1089,17 +1092,36 @@ document.addEventListener('DOMContentLoaded', async _event => {
 	})
 
 	const parseAndSearchLyrics = async () => {
-		const parsedQuery = await parseLyricsQuery()
+		const parsedQuery = await parseLyricsQueryAndSetColors()
 
 		// console.debug('parsedQuery = ', parsedQuery)
 		// console.debug('queryInput.value = ', queryInput.value)
 
 		if (parsedQuery == queryInput.value) return
 
-		searchLyrics(parsedQuery)
+		queryInput.value = parsedQuery
+
+		await searchLyrics()
 	}
 
-	await parseAndSearchLyrics()
+	const
+		searchParams = new URLSearchParams(window.location.search),
+		initialQuery = searchParams.get('initialQuery')
+
+	// console.debug('popup searchParams = ', Object.fromEntries(searchParams))
+
+	queryInput.manualInput = searchParams.get('manualInput') == 'true'
+
+	if (initialQuery) {
+		queryInput.value = initialQuery
+
+		//// Just set colors
+		parseLyricsQueryAndSetColors()
+
+		await searchLyrics()
+	} else {
+		await parseAndSearchLyrics()
+	}
 
 	//// Recursive `setTimeout` instead of `setInterval` to wait loading time
 	//// https://developer.mozilla.org/en-US/docs/Web/API/setInterval#ensure_that_execution_duration_is_shorter_than_interval_frequency

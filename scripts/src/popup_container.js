@@ -3,7 +3,10 @@ window.PopupContainer = class {
 
 	static #borderWidth = '3px'
 
-	constructor() {
+	constructor(initialQuery, manualInput) {
+		this.initialQuery = initialQuery
+		this.manualInput = manualInput
+
 		this.element = document.getElementById(this.constructor.#elementId)
 
 		if (this.element) {
@@ -258,7 +261,14 @@ window.PopupContainer = class {
 		`
 
 		// iframe.setAttribute('allow', '')
-		iframe.src = chrome.runtime.getURL('pages/popup.html')
+
+		const searchParams = new URLSearchParams({
+			initialQuery: this.initialQuery, manualInput: this.manualInput
+		})
+
+		// console.debug('popup container searchParams = ', Object.fromEntries(searchParams))
+
+		iframe.src = chrome.runtime.getURL(`pages/popup.html?${searchParams.toString()}`)
 
 		return iframe
 	}
