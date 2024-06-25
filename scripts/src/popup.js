@@ -80,6 +80,8 @@ document.addEventListener('DOMContentLoaded', async _event => {
 	})
 
 	document.querySelector('button.refresh').addEventListener('click', () => {
+		queryInput.manualInput = false
+
 		parseAndSearchLyrics()
 	})
 
@@ -1082,6 +1084,10 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		}
 	}
 
+	queryInput.addEventListener('input', _event => {
+		queryInput.manualInput = true
+	})
+
 	const parseAndSearchLyrics = async () => {
 		const parsedQuery = await parseLyricsQuery()
 
@@ -1099,7 +1105,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 	//// https://developer.mozilla.org/en-US/docs/Web/API/setInterval#ensure_that_execution_duration_is_shorter_than_interval_frequency
 	const watchLyricsQuery = () => {
 		setTimeout(async () => {
-			await parseAndSearchLyrics()
+			if (!queryInput.manualInput) await parseAndSearchLyrics()
 
 			watchLyricsQuery()
 		}, 1000)
