@@ -147,7 +147,50 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		)
 	}
 
+	const splitRgbaColor = rgbaColor => {
+		return rgbaColor.match(/rgba\(([^)]+)\)/)[1].split(',')
+	}
+
+	const getTrueBackgroundColor = initialBackgroundColor => {
+		let trueBackgroundColor = initialBackgroundColor
+
+		if (trueBackgroundColor.startsWith('rgba')) {
+			let
+				backgroundColorChannels = splitRgbaColor(trueBackgroundColor),
+				alphaChannel = backgroundColorChannels[3]
+
+			if (parseFloat(alphaChannel) == 0) trueBackgroundColor = 'white'
+		}
+
+		return trueBackgroundColor
+	}
+
+	const getTrueBorderColor = (initialBorderColor, backgroundColor) => {
+		let trueBorderColor = initialBorderColor
+
+		if (trueBorderColor.startsWith('rgba')) {
+			let
+				borderColorChannels = splitRgbaColor(trueBorderColor),
+				alphaChannel = borderColorChannels[3]
+
+			if (!alphaChannel.includes('%')) alphaChannel = `${parseFloat(alphaChannel) * 100}%`
+
+			trueBorderColor = `
+				color-mix(
+					in srgb,
+					rgb(${borderColorChannels.slice(0, 3)}) ${alphaChannel},
+					${backgroundColor}
+				)
+			`
+		}
+
+		return trueBorderColor
+	}
+
 	const setColors = colors => {
+		colors.background = getTrueBackgroundColor(colors.background)
+		colors.border = getTrueBorderColor(colors.border, colors.background)
+
 		document.documentElement.style.setProperty('--site-background-color', colors.background)
 		document.documentElement.style.setProperty('--site-text-color', colors.text)
 		document.documentElement.style.setProperty('--site-link-color', colors.link)
