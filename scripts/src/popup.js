@@ -927,7 +927,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 								text:
 									getComputedStyle(
 										document.querySelector(
-											'[class^="pages_container__"] [class*="Text-module_text-black-100"]'
+											'[class^="SongPageContent_container_"] [class*="Text-module_text-black-"]'
 										)
 									).color,
 								link:
