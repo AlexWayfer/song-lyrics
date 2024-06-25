@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+## 5.1 (2024-06-26)
+
+*   Watch for parsed search query change.
+    You can resume watching by pressing "Refresh" button.
+    Works with "Remove (Mix)" checkbox correctly.
+
+*   Don't display "Remove (Mix)" checkbox when useless.
+
+*   Pin correctly with a custom search query.
+
+*   Fix parsing for YouTube.
+
+*   Fix parsing for Shazam.
+
+*   Fix border and background colors opacity for iframe popup.
+
+*   Add "Clear iframe settings" context menu.
+    When you've messed up with its position or size.
+
+*   Increase lyrics cache TTL from 24 hours to 7 days.
+
+*   Update development dependencies.
+
+*   Fix ESLint offenses.
+
 ## 5.0 (2024-06-20)
 
 *   Return regular popup, but add a pin button to display it as iframe.
