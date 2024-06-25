@@ -764,15 +764,15 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				if (result) {
 					let
 						{ videoTitle, channelName, chapterTitle, colors } = result,
-						songTitile = chapterTitle || videoTitle
+						songTitle = chapterTitle || videoTitle
 
 					// console.debug('videoTitle = ', videoTitle)
 					// console.debug('channelName = ', channelName)
 					// console.debug('chapterTitle = ', chapterTitle)
-					// console.debug('songTitile = ', songTitile)
+					// console.debug('songTitle = ', songTitle)
 
 					//// Remove additional notes from song title
-					songTitile = songTitile.replace(
+					songTitle = songTitle.replace(
 						new RegExp(
 							'(?:' +
 								'[([](?:' +
@@ -792,7 +792,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 						''
 					)
 
-					let songArtists = songTitile.includes(' - ') ? '' : channelName
+					let songArtists = songTitle.includes(' - ') ? '' : channelName
 
 					setColors(colors)
 
