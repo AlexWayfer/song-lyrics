@@ -575,12 +575,9 @@ document.addEventListener('DOMContentLoaded', async _event => {
 					// console.debug('songTitle = ', songTitle)
 					// console.debug('songArtists = ', songArtists)
 
-					//// Take only the first artist, second can be from the featuring
-					let songArtist = songArtists.split(', ', 2)[0]
-
 					setColors(colors)
 
-					return buildQuery(songTitle, songArtist)
+					return buildQuery(songTitle, songArtists)
 				} else {
 					displayBreakdown()
 
