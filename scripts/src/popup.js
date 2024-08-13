@@ -24,8 +24,8 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		otherSearchResultsContainer = document.querySelector('body > .other-search-results'),
 		otherSearchResultsList = otherSearchResultsContainer.querySelector('ul'),
 		otherSearchResultTemplate = otherSearchResultsList.querySelector('template'),
-		searchPageContainer= document.querySelector('.search-page'),
-		reportNotFoundSongContainer= document.querySelector('.report-not-found-song'),
+		searchPageContainer = document.querySelector('.search-page'),
+		reportNotFoundSongContainer = document.querySelector('.report-not-found-song'),
 		breakdownNotice = document.querySelector('body > .breakdown'),
 		loadForm = document.querySelector('body > form.load'),
 		queryInput = loadForm.querySelector('label.query input[type="text"]'),
@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 	}
 
 	const buildGitHubNewIssueURI = (title, body) => {
-		return `https://github.com/AlexWayfer/song-lyrics/issues/new?` +
+		return 'https://github.com/AlexWayfer/song-lyrics/issues/new?' +
 			`title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`
 	}
 
