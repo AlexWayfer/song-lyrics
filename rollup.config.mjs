@@ -11,7 +11,7 @@ export default {
 	},
 	plugins: [
 		// https://github.com/alfredosalzillo/rollup-plugin-multi-input/issues/61
-		multiInput.default({ relative: 'scripts/src/' }),
+		multiInput({ relative: 'scripts/src/' }),
 		commonjs(),
 		resolve({
 			browser: true,
