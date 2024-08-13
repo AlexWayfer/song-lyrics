@@ -825,7 +825,7 @@ document.addEventListener('DOMContentLoaded', async _event => {
 						''
 					)
 
-					let songArtists = songTitle.includes(' - ') ? '' : channelName
+					let songArtists = songTitle.match(' [-—] ') ? '' : channelName
 
 					setColors(colors)
 
