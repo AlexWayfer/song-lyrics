@@ -183,9 +183,13 @@ body {
 		}
 	}
 
-	& a.search-page {
-		display: inline-block;
+	& > .search-page,
+	& > .report-not-found-song {
 		margin-top: 0.4em;
+	}
+
+	& > .report-not-found-song > * {
+		color: crimson;
 	}
 
 	& form.load {

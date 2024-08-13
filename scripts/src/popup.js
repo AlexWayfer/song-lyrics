@@ -24,7 +24,8 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		otherSearchResultsContainer = document.querySelector('body > .other-search-results'),
 		otherSearchResultsList = otherSearchResultsContainer.querySelector('ul'),
 		otherSearchResultTemplate = otherSearchResultsList.querySelector('template'),
-		searchPageLink = document.querySelector('a.search-page'),
+		searchPageContainer= document.querySelector('.search-page'),
+		reportNotFoundSongContainer= document.querySelector('.report-not-found-song'),
 		breakdownNotice = document.querySelector('body > .breakdown'),
 		loadForm = document.querySelector('body > form.load'),
 		queryInput = loadForm.querySelector('label.query input[type="text"]'),
@@ -214,7 +215,8 @@ document.addEventListener('DOMContentLoaded', async _event => {
 	}
 
 	const buildGitHubNewIssueURI = (title, body) => {
-		return `https://github.com/AlexWayfer/song-lyrics/issues/new?title=${title}&body=${body}`
+		return `https://github.com/AlexWayfer/song-lyrics/issues/new?` +
+			`title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`
 	}
 
 	const displayBreakdown = () => {
@@ -444,7 +446,8 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			loadForm.classList.remove('hidden')
 		}
 
-		searchPageLink.classList.remove('hidden')
+		searchPageContainer.classList.remove('hidden')
+		reportNotFoundSongContainer.classList.remove('hidden')
 	}
 
 	const searchLyrics = async () => {
@@ -455,7 +458,8 @@ document.addEventListener('DOMContentLoaded', async _event => {
 		notSupportedNotice.classList.add('hidden')
 		lyricsContainer.classList.add('hidden')
 		otherSearchResultsContainer.classList.add('hidden')
-		searchPageLink.classList.add('hidden')
+		searchPageContainer.classList.add('hidden')
+		reportNotFoundSongContainer.classList.add('hidden')
 		breakdownNotice.classList.add('hidden')
 
 		loadForm.classList.remove('hidden')
@@ -466,7 +470,16 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			encodedQuery = encodeURIComponent(query)
 
 		loadingQueryText.innerText = query
-		searchPageLink.href = `https://genius.com/search?q=${encodedQuery.replace(/[()]/g, '')}`
+
+		searchPageContainer.querySelector('a').href =
+			`https://genius.com/search?q=${encodedQuery.replace(/[()]/g, '')}`
+
+		reportNotFoundSongContainer.querySelector('a').href = buildGitHubNewIssueURI(
+			`The song "${query}" has not been found on \`${currentTabHostname}\``,
+
+			'Either the search query for Genius is wrong, ' +
+			'or we should have some additional lyrics platforms.'
+		)
 
 		if (!loadForm.removeMixSubmitting) {
 			removeMixLabel.classList.toggle('hidden', !query.match(removeMixRegexp))
@@ -1096,7 +1109,8 @@ document.addEventListener('DOMContentLoaded', async _event => {
 				lyricsContainer.classList.add('hidden')
 				otherSearchResultsContainer.classList.add('hidden')
 				notFoundNotice.classList.add('hidden')
-				searchPageLink.classList.add('hidden')
+				searchPageContainer.classList.add('hidden')
+				reportNotFoundSongContainer.classList.add('hidden')
 				breakdownNotice.classList.add('hidden')
 
 				switchToSystemTheme()
