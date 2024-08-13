@@ -1084,6 +1084,8 @@ document.addEventListener('DOMContentLoaded', async _event => {
 			}
 
 			default: {
+				// console.debug('unsupported platform')
+
 				loadingNotice.classList.add('hidden')
 				lyricsContainer.classList.add('hidden')
 				otherSearchResultsContainer.classList.add('hidden')
@@ -1117,8 +1119,9 @@ document.addEventListener('DOMContentLoaded', async _event => {
 
 		// console.debug('parsedQuery = ', parsedQuery)
 		// console.debug('queryInput.value = ', queryInput.value)
+		// console.debug('parsedQuery == queryInput.value = ', parsedQuery == queryInput.value)
 
-		if (!forced && parsedQuery == queryInput.value) return
+		if (!forced && (!parsedQuery || parsedQuery == queryInput.value)) return
 
 		queryInput.value = parsedQuery
 
