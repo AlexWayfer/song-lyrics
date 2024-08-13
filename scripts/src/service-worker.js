@@ -1,5 +1,13 @@
 chrome.contextMenus.onClicked.addListener(async info => {
 	switch (info.menuItemId) {
+		case 'open-changelog': {
+			chrome.tabs.create({
+				url: 'https://github.com/AlexWayfer/song-lyrics/blob/main/CHANGELOG.md'
+			})
+
+			break
+		}
+
 		case 'clear-cache': {
 			chrome.storage.local.remove('cache')
 
@@ -48,6 +56,12 @@ chrome.contextMenus.onClicked.addListener(async info => {
 
 chrome.runtime.onInstalled.addListener(async _details => {
 	chrome.storage.local.remove('cache')
+
+	chrome.contextMenus.create({
+		title: `Installed version: ${chrome.runtime.getManifest().version}`,
+		contexts: ['action'],
+		id: 'open-changelog'
+	})
 
 	chrome.contextMenus.create({
 		title: 'Clear lyrics cache',
