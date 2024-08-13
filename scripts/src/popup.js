@@ -805,17 +805,23 @@ document.addEventListener('DOMContentLoaded', async _event => {
 					// console.debug('songTitle = ', songTitle)
 
 					//// Remove additional notes from song title
+					const insideBrackets =
+						'(?:' +
+							'(?:\\w+ )*(?:Video(?: (?:HD|- Official))?|Soundtrack)|' +
+							'From [^)\\]]*|' +
+							'Lyrics|' +
+							'[^)\\]]* subtitles|' +
+							'OUT NOW|' +
+							'Single(?: \\d+)?|' +
+							'Премьера (?:клипа|песни|трека)[^)\\]]*' +
+						')'
+
 					songTitle = songTitle.replace(
 						new RegExp(
 							'(?:' +
-								'[([](?:' +
-									'(?:\\w+ )*(?:Video(?: (?:HD|- Official))?|Soundtrack)|' +
-									'From [^)]*|' +
-									'Lyrics|' +
-									'OUT NOW|' +
-									'Single(?: \\d+)?|' +
-									'Премьера (?:клипа|песни|трека)[^)]*' +
-								')[\\])]|' +
+								'[([]' +
+									`${insideBrackets}(?: | ${insideBrackets})*` +
+								'[\\])]|' +
 								'\\| (?:' +
 									'Реакция и разбор' +
 								')' +
