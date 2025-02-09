@@ -7,7 +7,7 @@
 		"@eslint/js": "^9.9.0",
 		"@rollup/plugin-commonjs": "^28.0.2",
 		"@rollup/plugin-node-resolve": "^16.0.0",
-		"@stylistic/eslint-plugin-js": "^2.6.2",
+		"@stylistic/eslint-plugin-js": "^3.1.0",
 		"@stylistic/stylelint-config": "^2.0.0",
 		"eslint": "^9.9.0",
 		"glob": "^11.0.0",
@@ -20,7 +20,7 @@
 		"rollup": "^4.20.0",
 		"rollup-plugin-notify": "^1.1.0",
 		"stylelint": "^16.8.1",
-		"stylelint-config-standard": "^36.0.1",
+		"stylelint-config-standard": "^37.0.0",
 		"zip-a-folder": "^3.1.7"
 	},
 	"scripts": {
