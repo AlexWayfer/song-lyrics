@@ -4,24 +4,24 @@
 		"fast-average-color": "^9.4.0"
 	},
 	"devDependencies": {
-		"@eslint/js": "^9.9.0",
+		"@eslint/js": "^9.20.0",
 		"@rollup/plugin-commonjs": "^28.0.2",
 		"@rollup/plugin-node-resolve": "^16.0.0",
 		"@stylistic/eslint-plugin-js": "^3.1.0",
 		"@stylistic/stylelint-config": "^2.0.0",
-		"eslint": "^9.9.0",
-		"glob": "^11.0.0",
-		"globals": "^15.9.0",
+		"eslint": "^9.20.0",
+		"glob": "^11.0.1",
+		"globals": "^15.14.0",
 		"npm-run-all": "^4.1.5",
 		"remark-cli": "^12.0.1",
 		"remark-gfm": "^4.0.0",
-		"remark-lint-list-item-indent": "^4.0.0",
-		"remark-preset-lint-recommended": "^7.0.0",
-		"rollup": "^4.20.0",
+		"remark-lint-list-item-indent": "^4.0.1",
+		"remark-preset-lint-recommended": "^7.0.1",
+		"rollup": "^4.34.6",
 		"rollup-plugin-notify": "^1.1.0",
-		"stylelint": "^16.8.1",
+		"stylelint": "^16.14.1",
 		"stylelint-config-standard": "^37.0.0",
-		"zip-a-folder": "^3.1.7"
+		"zip-a-folder": "^3.1.8"
 	},
 	"scripts": {
 		"lint:docs": "remark -f .",
