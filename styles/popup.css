@@ -8,7 +8,6 @@ body {
 
 	font-size: 18px;
 	margin: 0;
-	word-break: break-word;
 
 	&.in-iframe {
 		.lyrics {
