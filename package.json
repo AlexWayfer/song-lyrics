@@ -7,7 +7,7 @@
 		"@eslint/js": "^9.20.0",
 		"@rollup/plugin-commonjs": "^28.0.2",
 		"@rollup/plugin-node-resolve": "^16.0.0",
-		"@stylistic/eslint-plugin-js": "^3.1.0",
+		"@stylistic/eslint-plugin-js": "^4.0.1",
 		"@stylistic/stylelint-config": "^2.0.0",
 		"eslint": "^9.20.0",
 		"glob": "^11.0.1",
